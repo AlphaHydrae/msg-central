@@ -1,10 +1,10 @@
 import React from 'react';
 
-import './App.css';
+import './app.css';
 
 import logo from './logo.svg';
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
   return (
     <div className='App'>
       <header className='App-header'>
@@ -24,5 +24,3 @@ const App: React.FC = () => {
     </div>
   );
 };
-
-export default App;
