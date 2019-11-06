@@ -1,5 +1,13 @@
+import { combineReducers } from 'redux';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { initialWampPageState } from './wamp.state';
+import { editWampConnectionForm } from './wamp.actions';
+import { initialWampPageState, WampPageState } from './wamp.state';
 
-export const wampPageReducer = reducerWithInitialState(initialWampPageState);
+const connectionParamsReducer = reducerWithInitialState(initialWampPageState.connectionParams)
+  .case(editWampConnectionForm, (state, payload) => ({ ...state, ...payload }))
+;
+
+export const wampPageReducer = combineReducers<WampPageState>({
+  connectionParams: connectionParamsReducer
+});

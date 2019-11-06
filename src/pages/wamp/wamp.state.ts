@@ -1,16 +1,25 @@
-import { WampConnectionParams } from '../../domain/wamp-connection-params';
+export interface WampPageConnectionFormState {
+  readonly routerUrl: string;
+  readonly realm: string;
+  readonly namespace: string;
+  readonly authMethod: 'ticket' | null;
+  readonly authId: string;
+  readonly authTicket: string;
+  readonly saveAuth: boolean;
+}
 
 export interface WampPageState {
-  readonly connectionParams: WampConnectionParams;
+  readonly connectionParams: WampPageConnectionFormState;
 }
 
 export const initialWampPageState: WampPageState = {
   connectionParams: {
     routerUrl: '',
     realm: '',
-    namespace: null,
-    authId: null,
+    namespace: '',
     authMethod: null,
-    authTicket: null
+    authId: '',
+    authTicket: '',
+    saveAuth: false
   }
 };

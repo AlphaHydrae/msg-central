@@ -1,5 +1,8 @@
-import { reducerWithInitialState } from 'typescript-fsa-reducers';
+import { combineReducers } from 'redux';
 
-import { initialSessionState } from './session.state';
+import { wampPageReducer } from '../../pages/wamp/wamp.reducers';
+import { SessionState } from './session.state';
 
-export const sessionReducer = reducerWithInitialState(initialSessionState);
+export const sessionReducer = combineReducers<SessionState>({
+  wampPage: wampPageReducer
+});

@@ -4,10 +4,15 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogger } from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
 
+import { editWampConnectionForm } from '../pages/wamp/wamp.actions';
 import { AppEpicDependencies, rootEpic } from './epics';
 import { history } from './history';
 import { rootReducer } from './reducers';
 import { AppState } from './state';
+
+const silentActionTypes = [
+  editWampConnectionForm
+].map(creator => creator.type);
 
 export function configureStore() {
 
@@ -16,7 +21,8 @@ export function configureStore() {
   });
 
   const logger = createLogger({
-    collapsed: true
+    collapsed: true,
+    predicate: (_, action) => !silentActionTypes.includes(action.type)
   });
 
   const store = createStore(
