@@ -9,11 +9,11 @@ export interface WampPageConnectionFormState {
 }
 
 export interface WampPageState {
-  readonly connectionParams: WampPageConnectionFormState;
+  readonly connectionForm: WampPageConnectionFormState;
 }
 
 export const initialWampPageState: WampPageState = {
-  connectionParams: {
+  connectionForm: {
     routerUrl: '',
     realm: '',
     namespace: '',

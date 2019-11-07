@@ -1,7 +1,7 @@
 import { Action } from 'redux';
 import { StateObservable } from 'redux-observable';
 import { Observable } from 'rxjs';
-import { actionCreatorFactory } from 'typescript-fsa';
+import { actionCreatorFactory, AsyncActionCreators } from 'typescript-fsa';
 
 import { ActionType } from '../store/actions';
 import { AppEpicDependencies } from '../store/epics';
@@ -18,9 +18,18 @@ export const createEpic = (func: Epic) => func;
 const factory = actionCreatorFactory();
 
 const registeredActionTypes: string[] = [];
+const registeredAsyncActions: Array<AsyncActionCreators<any, any, any>> = [];
 
 export const createAction = <Payload = void>(type: ActionType) => {
   return factory<Payload>(registerActionType(type));
+};
+
+export const createAsyncAction = <Params, Result, Error>(type: ActionType) => {
+
+  const action = factory.async<Params, Result, Error>(registerActionType(type));
+  registeredAsyncActions.push(action);
+
+  return action;
 };
 
 function registerActionType(type: string) {
