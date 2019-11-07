@@ -1,4 +1,4 @@
-import { WampConnectionParams } from '../../domain/wamp/wamp-connection-params';
+import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
 
 export interface WampConnectionState {
   readonly connected: boolean;

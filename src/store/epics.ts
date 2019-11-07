@@ -3,7 +3,7 @@ import { AnyAction } from 'redux';
 import { combineEpics } from 'redux-observable';
 import WebSocket from 'ws';
 
-import { connectToWampRouterEpic, disconnectFromWampRouterEpic, submitWampConnectionFormEpic } from '../pages/wamp/wamp.epics';
+import { connectToWampRouterEpic, disconnectFromWampRouterEpic, submitWampConnectionFormEpic } from '../domain/wamp/wamp.epics';
 import { AppState } from './state';
 
 export interface AppEpicDependencies {

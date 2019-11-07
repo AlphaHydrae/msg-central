@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { connectToWampRouter, handleWampConnectionClosed } from '../../pages/wamp/wamp.actions';
+import { connectToWampRouter } from '../../components/wamp-connection-form/wamp-connection-form.actions';
+import { handleWampConnectionClosed } from '../../domain/wamp/wamp.actions';
 import { DataState, initialDataState } from './data.state';
 
 const wampConnectionReducer = reducerWithInitialState(initialDataState.wampConnection)

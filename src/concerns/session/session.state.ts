@@ -1,9 +1,9 @@
-import { initialWampPageState, WampPageState } from '../../pages/wamp/wamp.state';
+import { initialWampConnectionFormState, WampConnectionFormState } from '../../components/wamp-connection-form/wamp-connection-form.state';
 
 export interface SessionState {
-  readonly wampPage: WampPageState;
+  readonly wampConnectionForm: WampConnectionFormState;
 }
 
 export const initialSessionState: SessionState = {
-  wampPage: initialWampPageState
+  wampConnectionForm: initialWampConnectionFormState
 };

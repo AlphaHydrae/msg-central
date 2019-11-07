@@ -1,18 +1,15 @@
-import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
-import { Dispatch } from 'redux';
+import { connect, MapDispatchToProps } from 'react-redux';
 
-import { selectWampConnectionState } from '../../concerns/data/data.selectors';
-import { isWampAuthMethod } from '../../domain/wamp/wamp-auth-params';
+import { isWampAuthMethod } from '../../domain/wamp/wamp.auth-params';
 import { AppState } from '../../store/state';
 import { isPresent, isUrlString } from '../../utils/validations';
-import { disconnectFromWampRouter, editWampConnectionForm, submitWampConnectionForm } from './wamp.actions';
-import { WampPage, WampPageDispatchProps, WampPageStateProps } from './wamp.component';
-import { selectWampPageConnectionForm } from './wamp.selectors';
+import { editWampConnectionForm, submitWampConnectionForm } from './wamp-connection-form.actions';
+import { WampConnectionForm, WampConnectionFormDispatchProps } from './wamp-connection-form.component';
+import { selectWampConnectionFormState } from './wamp-connection-form.selectors';
 
-const mapStateToProps: MapStateToProps<WampPageStateProps, {}, AppState> = (state: AppState) => {
-  const connectionParams = selectWampPageConnectionForm(state);
+const mapStateToProps = (state: AppState) => {
+  const connectionParams = selectWampConnectionFormState(state);
   return {
-    connection: selectWampConnectionState(state),
     form: connectionParams,
     validations: {
       authIdPresent: connectionParams.authMethod === null || isPresent(connectionParams.authId),
@@ -24,12 +21,11 @@ const mapStateToProps: MapStateToProps<WampPageStateProps, {}, AppState> = (stat
   };
 };
 
-const mapDispatchToProps: MapDispatchToProps<WampPageDispatchProps, {}> = (dispatch: Dispatch) => ({
+const mapDispatchToProps: MapDispatchToProps<WampConnectionFormDispatchProps, {}> = dispatch => ({
   connect: event => {
     event.preventDefault();
     return dispatch(submitWampConnectionForm());
   },
-  disconnect: () => dispatch(disconnectFromWampRouter()),
   editAuthId: event => dispatch(editWampConnectionForm({ authId: event.currentTarget.value })),
   editAuthMethod: event => dispatch(editWampConnectionForm({
     authMethod: isWampAuthMethod(event.currentTarget.value) ? event.currentTarget.value : null
@@ -41,7 +37,7 @@ const mapDispatchToProps: MapDispatchToProps<WampPageDispatchProps, {}> = (dispa
   editSaveAuth: event => dispatch(editWampConnectionForm({ saveAuth: event.currentTarget.checked }))
 });
 
-export const WampPageContainer = connect<WampPageStateProps, WampPageDispatchProps, {}, AppState>(
+export const WampConnectionFormContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(WampPage);
+)(WampConnectionForm);

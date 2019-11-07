@@ -1,8 +1,8 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-import { HomePage } from './pages/home/home.component';
-import { WampPageContainer } from './pages/wamp/wamp.container';
+import { HomePage } from './pages/home/home-page.component';
+import { WampPageContainer } from './pages/wamp/wamp-page.container';
 import { WsPage } from './pages/ws/ws.component';
 
 export function Routes() {

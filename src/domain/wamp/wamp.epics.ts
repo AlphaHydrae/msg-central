@@ -4,15 +4,17 @@ import { Action } from 'redux';
 import { Observable, of } from 'rxjs';
 import { catchError, filter, first, ignoreElements, map, mergeMap, switchMapTo, tap, withLatestFrom } from 'rxjs/operators';
 
-import { WampConnectionParams } from '../../domain/wamp/wamp-connection-params';
+import { connectToWampRouter, submitWampConnectionForm } from '../../components/wamp-connection-form/wamp-connection-form.actions';
+import { selectWampConnectionFormParams } from '../../components/wamp-connection-form/wamp-connection-form.selectors';
+import { disconnectFromWampRouter } from '../../pages/wamp/wamp-page.actions';
 import { AppEpicDependencies } from '../../store/epics';
 import { createEpic } from '../../utils/store';
-import { connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, submitWampConnectionForm } from './wamp.actions';
-import { selectWampConnectionParams } from './wamp.selectors';
+import { WampConnectionParams } from './wamp.connection-params';
+import { handleWampConnectionClosed } from './wamp.actions';
 
 export const connectToWampRouterEpic = createEpic((action$, state$, deps) => action$.pipe(
   filter(connectToWampRouter.started.match),
-  withLatestFrom(state$.pipe(map(selectWampConnectionParams))),
+  withLatestFrom(state$.pipe(map(selectWampConnectionFormParams))),
   mergeMap(([ _, params ]) => connect(params, deps).pipe(
     catchError(error => of(connectToWampRouter.failed({ error, params })))
   ))
@@ -26,7 +28,7 @@ export const disconnectFromWampRouterEpic = createEpic((action$, _, deps) => act
 
 export const submitWampConnectionFormEpic = createEpic((action$, state$) => action$.pipe(
   filter(submitWampConnectionForm.match),
-  switchMapTo(state$.pipe(map(selectWampConnectionParams), first())),
+  switchMapTo(state$.pipe(map(selectWampConnectionFormParams), first())),
   map(params => connectToWampRouter.started(params))
 ));
 

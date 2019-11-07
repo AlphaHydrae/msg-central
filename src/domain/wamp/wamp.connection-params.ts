@@ -1,4 +1,4 @@
-import { WampAuthParams } from './wamp-auth-params';
+import { WampAuthParams } from './wamp.auth-params';
 
 export interface WampConnectionParams {
   readonly routerUrl: string;

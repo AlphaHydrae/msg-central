@@ -1,10 +1,12 @@
 import { routerMiddleware } from 'connected-react-router';
+import localforage from 'localforage';
+import { pick } from 'lodash';
 import { AnyAction, applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogger } from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
 
-import { editWampConnectionForm } from '../pages/wamp/wamp.actions';
+import { editWampConnectionForm } from '../components/wamp-connection-form/wamp-connection-form.actions';
 import { AppEpicDependencies, rootEpic } from './epics';
 import { history } from './history';
 import { rootReducer } from './reducers';
@@ -35,6 +37,10 @@ export function configureStore() {
   );
 
   epicMiddleware.run(rootEpic);
+
+  store.subscribe(() => {
+    localforage.setItem('store', pick(store.getState(), 'session')).catch(err => console.warn(err));
+  });
 
   return store;
 }
