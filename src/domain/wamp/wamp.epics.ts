@@ -9,8 +9,8 @@ import { selectWampConnectionFormParams } from '../../components/wamp-connection
 import { disconnectFromWampRouter } from '../../pages/wamp/wamp-page.actions';
 import { AppEpicDependencies } from '../../store/epics';
 import { createEpic } from '../../utils/store';
-import { WampConnectionParams } from './wamp.connection-params';
 import { handleWampConnectionClosed } from './wamp.actions';
+import { WampConnectionParams } from './wamp.connection-params';
 
 export const connectToWampRouterEpic = createEpic((action$, state$, deps) => action$.pipe(
   filter(connectToWampRouter.started.match),

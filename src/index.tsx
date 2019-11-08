@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 
 import './index.css';
 
-import { App } from './app';
+import { AppContainer } from './app.container';
 import { unregisterServiceWorker } from './serviceWorker';
 import { configureStore } from './store';
 import { history } from './store/history';
@@ -16,7 +16,7 @@ ReactDOM.render(
   (
     <Provider store={store}>
       <ConnectedRouter history={history}>
-        <App />
+        <AppContainer />
       </ConnectedRouter>
     </Provider>
   ),

@@ -4,16 +4,20 @@ import { Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
 import { GitHubRibbon } from './components/github-ribbon';
-import { Navbar } from './components/navbar/navbar.component';
+import { NavbarContainer } from './components/navbar/navbar.container';
 import { Routes } from './routes';
 
-export function App() {
+export interface AppStateProps {
+  readonly ready: boolean;
+}
+
+export function App(props: AppStateProps) {
   return (
     <Fragment>
       <GitHubRibbon />
-      <Navbar />
+      <NavbarContainer />
       <Container fluid={true}>
-        <Routes />
+        {props.ready && <Routes />}
       </Container>
     </Fragment>
   );

@@ -1,6 +1,4 @@
 import { routerMiddleware } from 'connected-react-router';
-import localforage from 'localforage';
-import { pick } from 'lodash';
 import { AnyAction, applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { createLogger } from 'redux-logger';
@@ -11,6 +9,7 @@ import { AppEpicDependencies, rootEpic } from './epics';
 import { history } from './history';
 import { rootReducer } from './reducers';
 import { AppState } from './state';
+import { createStorageMiddleware } from './storage';
 
 const silentActionTypes = [
   editWampConnectionForm
@@ -32,15 +31,12 @@ export function configureStore() {
     composeWithDevTools(
       applyMiddleware(routerMiddleware(history)),
       applyMiddleware(epicMiddleware),
+      applyMiddleware(createStorageMiddleware()),
       applyMiddleware(logger)
     )
   );
 
   epicMiddleware.run(rootEpic);
-
-  store.subscribe(() => {
-    localforage.setItem('store', pick(store.getState(), 'session')).catch(err => console.warn(err));
-  });
 
   return store;
 }
