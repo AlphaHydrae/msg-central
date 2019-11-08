@@ -1,7 +1,7 @@
 import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { selectEventsFromMostRecent, selectWampConnectionState } from '../../concerns/data/data.selectors';
-import { disconnectFromWampRouter, unsubscribeFromWampTopic, deleteWampTopicSubscription } from '../../domain/wamp/wamp.actions';
+import { deleteWampTopicSubscription, disconnectFromWampRouter, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
 import { selectOpeningWampConnection, selectWampSubscriptions } from '../../domain/wamp/wamp.selectors';
 import { selectCommunicationState } from '../../store/selectors';
 import { AppState } from '../../store/state';
