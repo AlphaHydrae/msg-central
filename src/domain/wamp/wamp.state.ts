@@ -18,6 +18,8 @@ export interface WampSubscription {
   readonly topic: string;
 }
 
+export type WampSubscriptionStatus = 'subscribed' | 'subscribing' | 'unsubscribed' | 'unsubscribing';
+
 export interface WampTopicEvent {
   readonly args: unknown[];
   readonly kwargs: unknown;
