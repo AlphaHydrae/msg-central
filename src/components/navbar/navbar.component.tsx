@@ -1,5 +1,7 @@
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Fragment } from 'react';
-import { Nav, Navbar as BootstrapNavbar } from 'react-bootstrap';
+import { Nav, Navbar as BootstrapNavbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 export interface NavbarStateProps {
@@ -17,12 +19,24 @@ export function Navbar(props: NavbarStateProps) {
           <BootstrapNavbar.Toggle aria-controls='navbar' />
           <BootstrapNavbar.Collapse id='navbar'>
             <Nav className='mr-auto'>
-              <LinkContainer to={'/ws'}>
+              <LinkContainer exact={true} to={'/ws'}>
                 <Nav.Link>WS</Nav.Link>
               </LinkContainer>
-              <LinkContainer to={'/wamp'}>
+              <LinkContainer exact={true} to={'/wamp'}>
                 <Nav.Link>WAMP</Nav.Link>
               </LinkContainer>
+            </Nav>
+            <Nav className='ml-auto'>
+              <OverlayTrigger
+                overlay={(
+                  <Tooltip id='github'>Fork me on GitHub</Tooltip>
+                )}
+                placement='left'
+              >
+                <a className='text-secondary' href='https://github.com/AlphaHydrae/asap' rel='noopener noreferrer' target='_blank'>
+                  <FontAwesomeIcon icon={faGithub} />
+                </a>
+              </OverlayTrigger>
             </Nav>
           </BootstrapNavbar.Collapse>
         </Fragment>

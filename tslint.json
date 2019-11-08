@@ -135,7 +135,7 @@
     "one-variable-per-declaration": false,
     "only-arrow-functions": false,
     "ordered-imports": true,
-    "prefer-conditional-expression": [ true, "check-else-if" ],
+    "prefer-conditional-expression": true,
     "prefer-method-signature": false,
     "prefer-object-spread": true,
     "prefer-or-operator-over-ternary": true,

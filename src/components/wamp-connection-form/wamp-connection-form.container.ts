@@ -1,15 +1,17 @@
-import { connect, MapDispatchToProps } from 'react-redux';
+import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { isWampAuthMethod } from '../../domain/wamp/wamp.auth-params';
+import { selectOpeningWampConnection } from '../../domain/wamp/wamp.selectors';
 import { AppState } from '../../store/state';
 import { isPresent, isUrlString } from '../../utils/validations';
 import { editWampConnectionForm, submitWampConnectionForm } from './wamp-connection-form.actions';
-import { WampConnectionForm, WampConnectionFormDispatchProps } from './wamp-connection-form.component';
+import { WampConnectionForm, WampConnectionFormDispatchProps, WampConnectionFormStateProps } from './wamp-connection-form.component';
 import { selectWampConnectionFormState } from './wamp-connection-form.selectors';
 
-const mapStateToProps = (state: AppState) => {
+const mapStateToProps: MapStateToProps<WampConnectionFormStateProps, {}, AppState> = state => {
   const connectionParams = selectWampConnectionFormState(state);
   return {
+    connecting: selectOpeningWampConnection(state) !== undefined,
     form: connectionParams,
     validations: {
       authIdPresent: connectionParams.authMethod === null || isPresent(connectionParams.authId),

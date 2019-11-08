@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Card, Form } from 'react-bootstrap';
 
 import { FormCheckboxChangeEvent, FormInputChangeEvent, FormSelectChangeEvent, FormSubmitEvent, isFormValid } from '../../utils/forms';
 import { WampConnectionFormState, WampConnectionFormValidations } from './wamp-connection-form.state';
@@ -16,6 +16,7 @@ export interface WampConnectionFormDispatchProps {
 }
 
 export interface WampConnectionFormStateProps {
+  readonly connecting: boolean;
   readonly form: WampConnectionFormState;
   readonly validations: WampConnectionFormValidations;
 }
@@ -25,75 +26,84 @@ export function WampConnectionForm(props: WampConnectionFormDispatchProps & Wamp
   const valid = isFormValid(props.validations);
 
   return (
-    <Form onSubmit={props.connect}>
-      <Form.Group controlId='url'>
-        <Form.Label>Router URL</Form.Label>
-        <Form.Control
-          type='text'
-          placeholder='wss://wamp.example.com/ws'
-          value={props.form.routerUrl}
-          onChange={props.editRouterUrl}
-          isInvalid={!props.validations.routerUrlPresent || !props.validations.routerUrlValid}
-        />
-        {!props.validations.routerUrlPresent && (
-          <Form.Text className='text-danger'>
-            The URL of the WAMP router is required.
-          </Form.Text>
-        )}
-        {!props.validations.routerUrlValid && (
-          <Form.Text className='text-danger'>
-            Must be a valid WebSocket URL with the <code>ws://</code> or <code>wss://</code> protocol.
-          </Form.Text>
-        )}
-      </Form.Group>
+    <Card>
+      <Card.Header>WAMP Connection</Card.Header>
+      <Card.Body>
+        <Form onSubmit={props.connect}>
+          <Form.Group controlId='url'>
+            <Form.Label>Router URL</Form.Label>
+            <Form.Control
+              type='text'
+              isInvalid={!props.validations.routerUrlPresent || !props.validations.routerUrlValid}
+              onChange={props.editRouterUrl}
+              placeholder='wss://wamp.example.com/ws'
+              readOnly={props.connecting}
+              value={props.form.routerUrl}
+            />
+            {!props.validations.routerUrlPresent && (
+              <Form.Text className='text-danger'>
+                The URL of the WAMP router is required.
+              </Form.Text>
+            )}
+            {!props.validations.routerUrlValid && (
+              <Form.Text className='text-danger'>
+                Must be a valid WebSocket URL with the <code>ws://</code> or <code>wss://</code> protocol.
+              </Form.Text>
+            )}
+          </Form.Group>
 
-      <Form.Group controlId='realm'>
-        <Form.Label>Realm</Form.Label>
-        <Form.Control
-          type='text'
-          placeholder='realm1'
-          value={props.form.realm}
-          onChange={props.editRealm}
-          isInvalid={!props.validations.realmPresent}
-        />
-        {!props.validations.realmPresent && (
-          <Form.Text className='text-danger'>
-            The WAMP realm to connect to is required.
-          </Form.Text>
-        )}
-      </Form.Group>
+          <Form.Group controlId='realm'>
+            <Form.Label>Realm</Form.Label>
+            <Form.Control
+              type='text'
+              onChange={props.editRealm}
+              placeholder='realm1'
+              readOnly={props.connecting}
+              isInvalid={!props.validations.realmPresent}
+              value={props.form.realm}
+            />
+            {!props.validations.realmPresent && (
+              <Form.Text className='text-danger'>
+                The WAMP realm to connect to is required.
+              </Form.Text>
+            )}
+          </Form.Group>
 
-      <Form.Group controlId='namespace'>
-        <Form.Label>Namespace</Form.Label>
-        <Form.Control
-          type='text'
-          placeholder='com.example'
-          value={props.form.namespace}
-          onChange={props.editNamespace}
-        />
-        <Form.Text>
-          Optional prefix for all procedure and topic names.
-        </Form.Text>
-      </Form.Group>
+          <Form.Group controlId='namespace'>
+            <Form.Label>Namespace</Form.Label>
+            <Form.Control
+              type='text'
+              onChange={props.editNamespace}
+              placeholder='com.example'
+              readOnly={props.connecting}
+              value={props.form.namespace}
+            />
+            <Form.Text>
+              Optional prefix for all procedure and topic names.
+            </Form.Text>
+          </Form.Group>
 
-      <Form.Group controlId='auth-type'>
-        <Form.Label>Authentication</Form.Label>
-        <Form.Control
-          as='select'
-          value={props.form.authMethod || undefined}
-          onChange={props.editAuthMethod}
-        >
-          <option value={''}>None</option>
-          <option value={'ticket'}>Ticket</option>
-        </Form.Control>
-      </Form.Group>
+          <Form.Group controlId='auth-type'>
+            <Form.Label>Authentication</Form.Label>
+            <Form.Control
+              as='select'
+              onChange={props.editAuthMethod}
+              readOnly={props.connecting}
+              value={props.form.authMethod || undefined}
+            >
+              <option value={''}>None</option>
+              <option value={'ticket'}>Ticket</option>
+            </Form.Control>
+          </Form.Group>
 
-      {props.form.authMethod && <WampAuthForm {...props} />}
+          {props.form.authMethod && <WampAuthForm {...props} />}
 
-      <Button variant='primary' type='submit' disabled={!valid}>
-        Connect
-      </Button>
-    </Form>
+          <Button disabled={props.connecting || !valid} type='submit' variant='primary'>
+            Connect
+          </Button>
+        </Form>
+      </Card.Body>
+    </Card>
   );
 }
 
@@ -108,10 +118,11 @@ function WampAuthForm(props: WampConnectionFormDispatchProps & WampConnectionFor
         <Form.Label>Ticket</Form.Label>
         <Form.Control
           type='password'
-          placeholder='Your secret ticket...'
-          value={params.authTicket}
-          onChange={props.editAuthTicket}
           isInvalid={!props.validations.authTicketPresent}
+          onChange={props.editAuthTicket}
+          placeholder='Your secret ticket...'
+          readOnly={props.connecting}
+          value={params.authTicket}
         />
         {!props.validations.authTicketPresent && (
           <Form.Text className='text-danger'>
@@ -128,10 +139,11 @@ function WampAuthForm(props: WampConnectionFormDispatchProps & WampConnectionFor
         <Form.Label>Identifier</Form.Label>
         <Form.Control
           type='text'
-          placeholder='Your authentication ID...'
-          value={params.authId}
-          onChange={props.editAuthId}
           isInvalid={!props.validations.authIdPresent}
+          onChange={props.editAuthId}
+          placeholder='Your authentication ID...'
+          readOnly={props.connecting}
+          value={params.authId}
         />
         {!props.validations.authIdPresent && (
           <Form.Text className='text-danger'>
@@ -145,8 +157,9 @@ function WampAuthForm(props: WampConnectionFormDispatchProps & WampConnectionFor
       <Form.Group controlId='auth-save'>
         <Form.Check
           type='checkbox'
-          label='Save credentials'
           checked={params.saveAuth}
+          label='Save credentials'
+          readOnly={props.connecting}
           onChange={props.editSaveAuth}
         />
         <Form.Text>

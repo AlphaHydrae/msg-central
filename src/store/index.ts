@@ -18,7 +18,9 @@ const silentActionTypes = [
 export function configureStore() {
 
   const epicMiddleware = createEpicMiddleware<AnyAction, AnyAction, AppState, AppEpicDependencies>({
-    dependencies: {}
+    dependencies: {
+      wampSubscriptions: {}
+    }
   });
 
   const logger = createLogger({

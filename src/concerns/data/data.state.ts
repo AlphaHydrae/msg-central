@@ -1,14 +1,14 @@
-import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
+import { WampEvent } from '../../domain/wamp/wamp.events';
+import { WampConnectionState } from '../../domain/wamp/wamp.state';
 
-export interface WampConnectionState {
-  readonly connected: boolean;
-  readonly params: WampConnectionParams;
-}
+export type AppEvent = WampEvent;
 
 export interface DataState {
+  readonly events: AppEvent[];
   readonly wampConnection: WampConnectionState | null;
 }
 
 export const initialDataState: DataState = {
+  events: [],
   wampConnection: null
 };
