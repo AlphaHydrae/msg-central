@@ -16,9 +16,9 @@ export type Epic = (
 export const createEpic = (func: Epic) => func;
 
 const factory = actionCreatorFactory();
-
 const registeredActionTypes: string[] = [];
-const registeredAsyncActions: Array<AsyncActionCreators<any, any, any>> = [];
+
+export const registeredAsyncActions: Array<AsyncActionCreators<any, any, any>> = [];
 
 export const createAction = <Payload = void>(type: ActionType) => {
   return factory<Payload>(registerActionType(type));

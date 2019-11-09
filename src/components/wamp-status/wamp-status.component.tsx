@@ -1,15 +1,16 @@
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import React, { Fragment } from 'react';
 import { Card, ListGroup, ListGroupItemProps } from 'react-bootstrap';
+import { Action } from 'typescript-fsa';
 
-import { OpeningWampConnection } from '../../concerns/comm/comm.state';
+import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
 import { WampConnectionState, WampSubscription } from '../../domain/wamp/wamp.state';
 import { IconButton } from '../icon-button';
 import { WampSubscriptionStatusContainer } from '../wamp-subscription-status/wamp-subscription-status.container';
 
 export interface WampStatusStateProps {
   readonly connection?: WampConnectionState;
-  readonly openingConnection?: OpeningWampConnection;
+  readonly openingConnection?: Action<WampConnectionParams>;
   readonly subscriptions: WampSubscription[];
 }
 
@@ -74,11 +75,11 @@ function WampConnectionStatus(props: WampStatusProps) {
         <span>
           Connecting to
           {' '}
-          <strong>{props.openingConnection.params.routerUrl}</strong>
+          <strong>{props.openingConnection.payload.routerUrl}</strong>
           {' '}
           on realm
           {' '}
-          <strong>{props.openingConnection.params.realm}</strong>
+          <strong>{props.openingConnection.payload.realm}</strong>
           ...
         </span>
       )}

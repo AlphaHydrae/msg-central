@@ -1,7 +1,7 @@
 import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { selectEventsFromMostRecent } from '../../concerns/data/data.selectors';
-import { deleteWampTopicSubscription, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
+import { deleteWampTopicSubscription, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
 import { WampSubscription, WampSubscriptionStatus } from '../../domain/wamp/wamp.state';
 import { selectCommunicationState } from '../../store/selectors';
 import { AppState } from '../../store/state';
@@ -32,10 +32,10 @@ function getWampSubscriptionStatus(subscription: WampSubscription, state: AppSta
     }
   }
 
-  for (const comm of selectCommunicationState(state)) {
-    if (comm.type === 'subscribingToWampTopic' && comm.subscription.id === subscription.id) {
+  for (const action of selectCommunicationState(state)) {
+    if (subscribeToWampTopic.started.match(action) && action.payload.id === subscription.id) {
       return 'subscribing';
-    } else if (comm.type === 'unsubscribingFromWampTopic' && comm.subscription.id === subscription.id) {
+    } else if (unsubscribeFromWampTopic.started.match(action) && action.payload.id === subscription.id) {
       return 'unsubscribing';
     }
   }

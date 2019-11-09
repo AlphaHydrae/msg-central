@@ -1,20 +1,12 @@
 import { createSelector } from 'reselect';
 
+import { createCommunicationActionInProgressSelector, createCommunicationActionSelector } from '../../concerns/comm/comm.utils';
 import { selectWampSubscriptionsDictionary } from '../../concerns/session/session.selectors';
-import { selectCommunicationState } from '../../store/selectors';
+import { connectToWampRouter } from './wamp.actions';
 
-export const selectOpeningWampConnection = createSelector(
-  selectCommunicationState,
-  state => {
-    for (const comm of state) {
-      if (comm.type === 'openingWampConnection') {
-        return comm;
-      }
-    }
+export const selectConnectingToWampRouter = createCommunicationActionInProgressSelector(connectToWampRouter);
 
-    return;
-  }
-);
+export const selectConnectToWampRouterAction = createCommunicationActionSelector(connectToWampRouter);
 
 export const selectWampSubscriptions = createSelector(
   selectWampSubscriptionsDictionary,

@@ -2,13 +2,13 @@ import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { selectWampConnectionState } from '../../concerns/data/data.selectors';
 import { disconnectFromWampRouter } from '../../domain/wamp/wamp.actions';
-import { selectOpeningWampConnection, selectWampSubscriptions } from '../../domain/wamp/wamp.selectors';
+import { selectConnectToWampRouterAction, selectWampSubscriptions } from '../../domain/wamp/wamp.selectors';
 import { AppState } from '../../store/state';
 import { WampStatus, WampStatusDispatchProps, WampStatusStateProps } from './wamp-status.component';
 
 export const mapStateToProps: MapStateToProps<WampStatusStateProps, {}, AppState> = state => ({
   connection: selectWampConnectionState(state),
-  openingConnection: selectOpeningWampConnection(state),
+  openingConnection: selectConnectToWampRouterAction(state),
   subscriptions: selectWampSubscriptions(state)
 });
 

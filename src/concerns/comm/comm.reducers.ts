@@ -2,52 +2,33 @@ import { reject } from 'lodash';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 import { connectToWampRouter, handleWampConnectionClosed, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
+import { registeredAsyncActions } from '../../utils/store';
 import { initialCommunicationState } from './comm.state';
+import { completionActionHasSameParams, getCompletionCreators, isCompletionAction } from './comm.utils';
 
 export const communicationReducer = reducerWithInitialState(initialCommunicationState)
 
-  .cases(
-    [ connectToWampRouter.done, connectToWampRouter.failed ],
-    (state, payload) => reject(state, comm => comm.type === 'openingWampConnection' && comm.params.routerUrl === payload.params.routerUrl)
+  .casesWithAction(
+    registeredAsyncActions.map(creator => creator.started),
+    (state, action) => [ ...state, action ]
   )
 
-  .case(connectToWampRouter.started, (state, payload) => [
-    ...state,
-    {
-      type: 'openingWampConnection',
-      params: payload
-    }
-  ])
+  .casesWithAction(
+    getCompletionCreators(registeredAsyncActions),
+    (state, action) => state.filter(
+      ongoing => !isCompletionAction(ongoing, action) || !completionActionHasSameParams(ongoing, action)
+    )
+  )
 
   .case(
     handleWampConnectionClosed,
-    state => reject(state, comm => comm.type === 'openingWampConnection' || comm.type === 'subscribingToWampTopic' || comm.type === 'unsubscribingFromWampTopic')
+    state => reject(
+      state,
+      comm =>
+        comm.type === connectToWampRouter.started.type ||
+        comm.type === subscribeToWampTopic.started.type ||
+        comm.type === unsubscribeFromWampTopic.started.type
+    )
   )
-
-  .cases(
-    [ subscribeToWampTopic.done, subscribeToWampTopic.failed ],
-    (state, payload) => reject(state, comm => comm.type === 'subscribingToWampTopic' && comm.subscription.id === payload.params.id)
-  )
-
-  .case(subscribeToWampTopic.started, (state, payload) => [
-    ...state,
-    {
-      type: 'subscribingToWampTopic',
-      subscription: payload
-    }
-  ])
-
-  .cases(
-    [ unsubscribeFromWampTopic.done, unsubscribeFromWampTopic.failed ],
-    (state, payload) => reject(state, comm => comm.type === 'unsubscribingFromWampTopic' && comm.subscription.id === payload.params.id)
-  )
-
-  .case(unsubscribeFromWampTopic.started, (state, payload) => [
-    ...state,
-    {
-      type: 'unsubscribingFromWampTopic',
-      subscription: payload
-    }
-  ])
 
 ;
