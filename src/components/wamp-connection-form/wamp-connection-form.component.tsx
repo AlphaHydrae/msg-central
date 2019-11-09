@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 
-import { FormCheckboxChangeEvent, FormInputChangeEvent, FormSelectChangeEvent, FormSubmitEvent, isFormInvalid, isFieldInvalid } from '../../utils/forms';
+import { FormCheckboxChangeEvent, FormInputChangeEvent, FormSelectChangeEvent, FormSubmitEvent, isFieldInvalid, isFormInvalid } from '../../utils/forms';
 import { WampConnectionFormState, WampConnectionFormValidations } from './wamp-connection-form.state';
 
 export interface WampConnectionFormDispatchProps {
