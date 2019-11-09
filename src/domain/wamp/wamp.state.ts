@@ -1,10 +1,3 @@
-import { WampConnectionParams } from './wamp.connection-params';
-
-export interface WampConnectionState {
-  readonly connected: boolean;
-  readonly params: WampConnectionParams;
-}
-
 export interface WampError {
   readonly type: WampErrorType;
   readonly error: unknown;
@@ -13,7 +6,8 @@ export interface WampError {
 
 export type WampErrorType = 'internalError' | 'userError';
 
-export interface WampSubscription {
+export interface WampSubscriptionParams {
+  readonly connectionId: string;
   readonly id: string;
   readonly topic: string;
 }

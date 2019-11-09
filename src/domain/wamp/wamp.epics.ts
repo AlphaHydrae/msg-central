@@ -1,4 +1,4 @@
-import { Connection, Error as AutobahnError, IConnectionOptions } from 'autobahn';
+import { Connection, Error as AutobahnError, IConnectionOptions, Subscription } from 'autobahn';
 import { constant } from 'lodash';
 import { Action } from 'redux';
 import { from, Observable, Observer, of, throwError } from 'rxjs';
@@ -10,10 +10,11 @@ import { selectWampConnectionFormParams } from '../../components/wamp-connection
 import { submitWampSubscriptionForm } from '../../components/wamp-subscription-form/wamp-subscription-form.actions';
 import { AppEpicDependencies } from '../../store/epics';
 import { createEpic } from '../../utils/store';
-import { connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, WampClientError, unsubscribeFromWampTopic } from './wamp.actions';
+import { isNotUndefined } from '../../utils/validations';
+import { connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampClientError } from './wamp.actions';
 import { WampConnectionParams } from './wamp.connection-params';
 import { selectWampSubscriptions } from './wamp.selectors';
-import { WampErrorType, WampSubscription } from './wamp.state';
+import { WampErrorType, WampSubscriptionParams } from './wamp.state';
 
 export const connectToWampRouterEpic = createEpic((action$, state$, deps) => action$.pipe(
   filter(connectToWampRouter.started.match),
@@ -23,7 +24,15 @@ export const connectToWampRouterEpic = createEpic((action$, state$, deps) => act
 
 export const disconnectFromWampRouterEpic = createEpic((action$, _, deps) => action$.pipe(
   filter(disconnectFromWampRouter.match),
-  tap(() => deps.wamp && deps.wamp.close()),
+  tap(action => {
+
+    const wamp = deps.wamp.get(action.payload.id);
+    if (!wamp) {
+      return console.warn(`WAMP connection ${action.payload.id} unavailable`);
+    }
+
+    wamp.connection.close();
+  }),
   ignoreElements()
 ));
 
@@ -39,12 +48,24 @@ export const submitWampConnectionFormEpic = createEpic((action$, state$) => acti
   map(params => connectToWampRouter.started(params))
 ));
 
-export const submitWampSubscriptionFormEpic = createEpic(action$ => action$.pipe(
+export const submitWampSubscriptionFormEpic = createEpic((action$, state$) => action$.pipe(
   filter(submitWampSubscriptionForm.match),
-  map(action => subscribeToWampTopic.started({
-    id: uuid(),
-    topic: action.payload.topic
-  }))
+  withLatestFrom(state$),
+  map(([ action, state ]) => {
+
+    // FIXME: attach to correct connection
+    const connection = Object.values(state.session.wampConnections)[0];
+    if (!connection) {
+      return;
+    }
+
+    return subscribeToWampTopic.started({
+      connectionId: connection.id,
+      id: uuid(),
+      topic: action.payload.topic
+    });
+  }),
+  filter(isNotUndefined)
 ));
 
 export const subscribeToWampTopicEpic = createEpic((action$, _, deps) => action$.pipe(
@@ -85,7 +106,7 @@ function connect(params: WampConnectionParams, deps: AppEpicDependencies): Obser
     };
 
     const connection = new Connection(connectionOptionsWithHandlers);
-    deps.wamp = connection;
+    deps.wamp.set(params.id, { connection, subscriptions: new Map() });
 
     connection.open();
 
@@ -108,41 +129,49 @@ function connect(params: WampConnectionParams, deps: AppEpicDependencies): Obser
       }
 
       observer.complete();
-      deps.wamp = undefined;
-      deps.wampSubscriptions = {};
+      deps.wamp.delete(params.id);
 
       return true;
     };
   });
 }
 
-function subscribe(params: WampSubscription, deps: AppEpicDependencies): Observable<Action> {
-  if (!deps.wamp) {
-    return throwError(new Error('WAMP connection unavailable'));
+function subscribe(params: WampSubscriptionParams, deps: AppEpicDependencies): Observable<Action> {
+
+  const wamp = deps.wamp.get(params.connectionId);
+  if (!wamp) {
+    return throwError(new Error(`WAMP connection ${params.connectionId} unavailable`));
   }
 
-  const session = deps.wamp.session;
+  const session = wamp.connection.session;
   if (!session) {
-    return throwError(new Error('WAMP session unavailable'));
+    return throwError(new Error(`WAMP session unavailable for connection ${params.connectionId}`));
   }
 
+  let subscription: Subscription | undefined;
   return new Observable(observer => {
     // FIXME: complete observables
-    session.subscribe(params.topic, (args, kwargs, details) => observer.next(handleWampTopicEvent({
+    session.subscribe(params.topic, (args, kwargs, details) => subscription && observer.next(handleWampTopicEvent({
+      connectionId: params.connectionId,
       event: { args, kwargs, details },
-      subscriptionId: params.id
+      subscriptionId: subscription.id
     }))).then(sub => {
-      deps.wampSubscriptions[params.id] = sub;
+      subscription = sub;
       observer.next(subscribeToWampTopic.done({ params }));
     });
   });
 }
 
-function unsubscribe(subscription: WampSubscription, deps: AppEpicDependencies) {
+function unsubscribe(subscription: WampSubscriptionParams, deps: AppEpicDependencies) {
 
-  const wampSubscription = deps.wampSubscriptions[subscription.id];
+  const wamp = deps.wamp.get(subscription.connectionId);
+  if (!wamp) {
+    return throwError(new Error(`WAMP connection ${subscription.connectionId} unavailable for subscription ${subscription.id}`));
+  }
+
+  const wampSubscription = wamp.subscriptions.get(subscription.id);
   if (!wampSubscription) {
-    return throwError(new Error(`WAMP subscription ${subscription.id} unavailable`));
+    return throwError(new Error(`WAMP subscription ${subscription.id} unavailable for connection ${subscription.id}`));
   }
 
   return from(wampSubscription.unsubscribe().then(() => unsubscribeFromWampTopic.done({ params: subscription })));

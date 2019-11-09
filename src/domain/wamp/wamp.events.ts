@@ -1,6 +1,6 @@
 import { AppEventBase } from '../events/events.state';
 import { WampConnectionParams } from './wamp.connection-params';
-import { WampSubscription } from './wamp.state';
+import { WampSubscriptionParams } from './wamp.state';
 
 export interface WampEventBase extends AppEventBase {
   readonly protocol: 'wamp';
@@ -20,12 +20,12 @@ export interface WampConnectionOpen extends WampEventBase {
 
 export interface WampTopicSubscribed extends WampEventBase {
   readonly type: 'wampTopicSubscribed';
-  readonly subscription: WampSubscription;
+  readonly subscription: WampSubscriptionParams;
 }
 
 export interface WampTopicUnsubscribed extends WampEventBase {
   readonly type: 'wampTopicUnsubscribed';
-  readonly subscription: WampSubscription;
+  readonly subscription: WampSubscriptionParams;
 }
 
 export type WampEvent =

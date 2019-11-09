@@ -1,10 +1,10 @@
 import { createSelector } from 'reselect';
 
-import { selectSessionState } from '../../store/selectors';
+import { selectControlState } from '../../store/selectors';
 import { wampConnectionFormToParams } from './wamp-connection-form.utils';
 
 export const selectWampConnectionFormState = createSelector(
-  selectSessionState,
+  selectControlState,
   session => session.wampConnectionForm
 );
 

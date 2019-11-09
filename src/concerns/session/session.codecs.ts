@@ -1,9 +1,8 @@
 import * as t from 'io-ts';
 
-import { WampConnectionFormCodec } from '../../components/wamp-connection-form/wamp-connection-form.codecs';
-import { WampSubscriptionCodec } from '../../domain/wamp/wamp.codecs';
+import { WampConnectionParamsCodec, WampSubscriptionParamsCodec } from '../../domain/wamp/wamp.codecs';
 
 export const SessionStateCodec = t.interface({
-  wampConnectionForm: WampConnectionFormCodec,
-  wampSubscriptions: t.record(t.string, WampSubscriptionCodec)
+  wampConnections: t.record(t.string, WampConnectionParamsCodec),
+  wampSubscriptions: t.record(t.string, WampSubscriptionParamsCodec)
 });

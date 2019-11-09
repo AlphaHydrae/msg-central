@@ -1,10 +1,11 @@
 import { createAction, createAsyncAction } from '../../utils/store';
 import { WampConnectionParams } from './wamp.connection-params';
-import { WampError, WampSubscription, WampTopicEvent } from './wamp.state';
+import { WampError, WampSubscriptionParams, WampTopicEvent } from './wamp.state';
 
 export interface HandleWampTopicEventParams {
+  readonly connectionId: string;
   readonly event: WampTopicEvent;
-  readonly subscriptionId: string;
+  readonly subscriptionId: number;
 }
 
 export interface WampConnectionClosedParams {
@@ -26,10 +27,10 @@ export interface WampClientError {
 }
 
 export const connectToWampRouter = createAsyncAction<WampConnectionParams, void, WampConnectionError>('CONNECT_TO_WAMP_ROUTER');
-export const deleteWampTopicSubscription = createAction<WampSubscription>('DELETE_WAMP_TOPIC_SUBSCRIPTION');
-export const disconnectFromWampRouter = createAction('DISCONNECT_FROM_WAMP_ROUTER');
+export const deleteWampTopicSubscription = createAction<WampSubscriptionParams>('DELETE_WAMP_TOPIC_SUBSCRIPTION');
+export const disconnectFromWampRouter = createAction<WampConnectionParams>('DISCONNECT_FROM_WAMP_ROUTER');
 export const handleWampConnectionClosed = createAction<WampConnectionClosedParams>('HANDLE_WAMP_CONNECTION_CLOSED');
 export const handleWampError = createAction<WampError>('HANDLE_WAMP_ERROR');
 export const handleWampTopicEvent = createAction<HandleWampTopicEventParams>('HANDLE_WAMP_TOPIC_EVENT');
-export const subscribeToWampTopic = createAsyncAction<WampSubscription, void, WampClientError>('SUBSCRIBE_TO_WAMP_TOPIC');
-export const unsubscribeFromWampTopic = createAsyncAction<WampSubscription, void, WampClientError>('UNSUBSCRIBE_FROM_WAMP_TOPIC');
+export const subscribeToWampTopic = createAsyncAction<WampSubscriptionParams, void, WampClientError>('SUBSCRIBE_TO_WAMP_TOPIC');
+export const unsubscribeFromWampTopic = createAsyncAction<WampSubscriptionParams, void, WampClientError>('UNSUBSCRIBE_FROM_WAMP_TOPIC');

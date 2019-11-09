@@ -2,7 +2,7 @@ import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { selectEventsFromMostRecent } from '../../concerns/data/data.selectors';
 import { deleteWampTopicSubscription, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
-import { WampSubscription, WampSubscriptionStatus } from '../../domain/wamp/wamp.state';
+import { WampSubscriptionParams, WampSubscriptionStatus } from '../../domain/wamp/wamp.state';
 import { selectCommunicationState } from '../../store/selectors';
 import { AppState } from '../../store/state';
 import { WampSubscriptionStatusComponent, WampSubscriptionStatusDispatchProps, WampSubscriptionStatusOwnProps, WampSubscriptionStatusStateProps } from './wamp-subscription-status.component';
@@ -16,9 +16,12 @@ const mapDispatchToProps: MapDispatchToProps<WampSubscriptionStatusDispatchProps
   unsubscribe: () => dispatch(unsubscribeFromWampTopic.started(props.subscription))
 });
 
-export const WampSubscriptionStatusContainer = connect(mapStateToProps, mapDispatchToProps)(WampSubscriptionStatusComponent);
+export const WampSubscriptionStatusContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WampSubscriptionStatusComponent);
 
-function getWampSubscriptionStatus(subscription: WampSubscription, state: AppState): WampSubscriptionStatus {
+function getWampSubscriptionStatus(subscription: WampSubscriptionParams, state: AppState): WampSubscriptionStatus {
 
   const events = selectEventsFromMostRecent(state);
   const lastConnectionEventIndex = events.findIndex(event => event.type === 'wampConnectionClosed' || event.type === 'wampConnectionOpen');

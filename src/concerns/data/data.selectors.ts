@@ -11,8 +11,3 @@ export const selectEventsFromMostRecent = createSelector(
   selectEvents,
   events => events.slice().reverse()
 );
-
-export const selectWampConnectionState = createSelector(
-  selectDataState,
-  data => data.wampConnection || undefined
-);

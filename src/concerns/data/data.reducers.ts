@@ -1,9 +1,24 @@
+import { constant } from 'lodash';
 import { combineReducers } from 'redux';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 import { connectToWampRouter, handleWampConnectionClosed, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
 import { createWampEvent } from '../../domain/wamp/wamp.utils';
 import { DataState, initialDataState } from './data.state';
+
+const activeWampConnectionsReducer = reducerWithInitialState(initialDataState.activeWampConnections)
+
+  .case(
+    connectToWampRouter.done,
+    (state, payload) => [ ...state, payload.params.id ]
+  )
+
+  .cases(
+    [ connectToWampRouter.failed, handleWampConnectionClosed ],
+    constant([])
+  )
+
+;
 
 const eventsReducer = reducerWithInitialState(initialDataState.events)
 
@@ -51,18 +66,7 @@ const eventsReducer = reducerWithInitialState(initialDataState.events)
 
 ;
 
-const wampConnectionReducer = reducerWithInitialState(initialDataState.wampConnection)
-
-  .case(connectToWampRouter.done, (_, payload) => ({
-    connected: true,
-    params: payload.params
-  }))
-
-  .cases([ connectToWampRouter.failed, handleWampConnectionClosed ], () => null)
-
-;
-
 export const dataReducer = combineReducers<DataState>({
-  events: eventsReducer,
-  wampConnection: wampConnectionReducer
+  activeWampConnections: activeWampConnectionsReducer,
+  events: eventsReducer
 });

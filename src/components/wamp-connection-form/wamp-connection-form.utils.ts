@@ -1,3 +1,5 @@
+import uuid from 'uuid/v4';
+
 import { WampAuthParams } from '../../domain/wamp/wamp.auth-params';
 import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
 import { WampConnectionFormState } from './wamp-connection-form.state';
@@ -15,6 +17,7 @@ export function wampConnectionFormToParams(form: WampConnectionFormState): WampC
 
   return {
     auth,
+    id: uuid(),
     namespace: form.namespace || undefined,
     realm: form.realm,
     routerUrl: form.routerUrl

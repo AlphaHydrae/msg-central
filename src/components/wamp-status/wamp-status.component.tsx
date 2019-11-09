@@ -4,21 +4,23 @@ import { Card, ListGroup, ListGroupItemProps } from 'react-bootstrap';
 import { Action } from 'typescript-fsa';
 
 import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
-import { WampConnectionState, WampSubscription } from '../../domain/wamp/wamp.state';
+import { WampSubscriptionParams } from '../../domain/wamp/wamp.state';
 import { IconButton } from '../icon-button';
 import { WampSubscriptionStatusContainer } from '../wamp-subscription-status/wamp-subscription-status.container';
 
 export interface WampStatusStateProps {
-  readonly connection?: WampConnectionState;
+  readonly connection?: WampConnectionParams;
   readonly openingConnection?: Action<WampConnectionParams>;
-  readonly subscriptions: WampSubscription[];
+  readonly subscriptions: WampSubscriptionParams[];
 }
 
 export interface WampStatusDispatchProps {
-  readonly disconnect: () => void;
+  readonly disconnect: (connection: WampConnectionParams) => void;
 }
 
-export type WampStatusProps = WampStatusDispatchProps & WampStatusStateProps;
+export interface WampStatusProps extends WampStatusDispatchProps, WampStatusStateProps {
+  readonly onDisconnectClicked: () => void;
+}
 
 export function WampStatus(props: WampStatusProps) {
   return (
@@ -53,17 +55,17 @@ function WampConnectionStatus(props: WampStatusProps) {
           <span>
             Connected to
             {' '}
-            <strong>{props.connection.params.routerUrl}</strong>
+            <strong>{props.connection.routerUrl}</strong>
             {' '}
             on realm
             {' '}
-            <strong>{props.connection.params.realm}</strong>
+            <strong>{props.connection.realm}</strong>
           </span>
           <IconButton
             className='ml-3 float-right'
             icon={faSignOutAlt}
             id='wamp-disconnect'
-            onClick={props.disconnect}
+            onClick={props.onDisconnectClicked}
             size='sm'
             tooltip='Disconnect'
             type='button'

@@ -21,7 +21,8 @@ export function configureStore() {
 
   const epicMiddleware = createEpicMiddleware<AnyAction, AnyAction, AppState, AppEpicDependencies>({
     dependencies: {
-      wampSubscriptions: {}
+      wamp: new Map(),
+      ws: new Map()
     }
   });
 

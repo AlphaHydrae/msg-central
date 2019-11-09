@@ -1,5 +1,5 @@
 import localforage from 'localforage';
-import { debounce } from 'lodash';
+import { debounce, mapValues } from 'lodash';
 import { Middleware } from 'redux';
 
 import { initialSessionState } from '../concerns/session/session.state';
@@ -49,14 +49,14 @@ async function saveState(state: AppState) {
 }
 
 function getStateToSave(state: AppState): SavedState {
-  const wampConnectionForm = state.session.wampConnectionForm;
+  const wampConnections = state.session.wampConnections;
   return {
     session: {
       ...state.session,
-      wampConnectionForm: {
-        ...wampConnectionForm,
-        authTicket: wampConnectionForm.saveAuth ? wampConnectionForm.authTicket : ''
-      }
+      wampConnections: mapValues(wampConnections, conn => conn ? {
+        ...conn,
+        auth: conn.auth && conn.auth.method === 'ticket' ? { ...conn.auth, ticket: '' } : undefined
+      } : undefined)
     }
   };
 }

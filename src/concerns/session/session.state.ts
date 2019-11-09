@@ -1,13 +1,13 @@
-import { initialWampConnectionFormState, WampConnectionFormState } from '../../components/wamp-connection-form/wamp-connection-form.state';
-import { WampSubscription } from '../../domain/wamp/wamp.state';
+import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
+import { WampSubscriptionParams } from '../../domain/wamp/wamp.state';
 import { Dictionary } from '../../utils/types';
 
 export interface SessionState {
-  readonly wampConnectionForm: WampConnectionFormState;
-  readonly wampSubscriptions: Dictionary<WampSubscription>;
+  readonly wampConnections: Dictionary<WampConnectionParams>;
+  readonly wampSubscriptions: Dictionary<WampSubscriptionParams>;
 }
 
 export const initialSessionState: SessionState = {
-  wampConnectionForm: initialWampConnectionFormState,
+  wampConnections: {},
   wampSubscriptions: {}
 };

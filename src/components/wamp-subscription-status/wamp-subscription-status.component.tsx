@@ -2,7 +2,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import { ListGroup, ListGroupItemProps } from 'react-bootstrap';
 
-import { WampSubscription, WampSubscriptionStatus } from '../../domain/wamp/wamp.state';
+import { WampSubscriptionParams, WampSubscriptionStatus } from '../../domain/wamp/wamp.state';
 import { IconButton } from '../icon-button';
 
 export interface WampSubscriptionStatusDispatchProps {
@@ -11,7 +11,7 @@ export interface WampSubscriptionStatusDispatchProps {
 }
 
 export interface WampSubscriptionStatusOwnProps {
-  readonly subscription: WampSubscription;
+  readonly subscription: WampSubscriptionParams;
 }
 
 export interface WampSubscriptionStatusStateProps {

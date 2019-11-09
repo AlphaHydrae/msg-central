@@ -3,20 +3,42 @@ import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 import { loadSavedState } from '../../store/storage';
 import { Dictionary } from '../../utils/types';
-import { deleteWampTopicSubscription, subscribeToWampTopic, unsubscribeFromWampTopic } from './wamp.actions';
-import { WampSubscription } from './wamp.state';
+import { connectToWampRouter, deleteWampTopicSubscription, subscribeToWampTopic, unsubscribeFromWampTopic } from './wamp.actions';
+import { WampConnectionParams } from './wamp.connection-params';
+import { WampSubscriptionParams } from './wamp.state';
+import { getNewWampSubscriptionKey, getWampSubscriptionKey } from './wamp.utils';
 
-export const wampSubscriptionsReducer = reducerWithInitialState<Dictionary<WampSubscription>>({})
+export const wampConnectionsReducer = reducerWithInitialState<Dictionary<WampConnectionParams>>({})
 
-  .case(deleteWampTopicSubscription, (state, payload) => omit(state, payload.id))
+  .case(
+    connectToWampRouter.done,
+    (state, payload) => ({ ...state, [payload.params.id]: payload.params })
+  )
 
-  .case(loadSavedState, (_, payload) => payload.session.wampSubscriptions)
+  .case(loadSavedState, (_, payload) => payload.session.wampConnections)
+
+;
+
+export const wampSubscriptionsReducer = reducerWithInitialState<Dictionary<WampSubscriptionParams>>({})
+
+  .case(
+    deleteWampTopicSubscription,
+    (state, payload) => omit(state, getWampSubscriptionKey(payload))
+  )
+
+  .case(
+    loadSavedState,
+    (_, payload) => payload.session.wampSubscriptions
+  )
 
   .case(subscribeToWampTopic.done, (state, payload) => ({
     ...state,
-    [payload.params.id]: payload.params
+    [getNewWampSubscriptionKey(payload)]: payload.params
   }))
 
-  .case(unsubscribeFromWampTopic.done, (state, payload) => omit(state, payload.params.id))
+  .case(
+    unsubscribeFromWampTopic.done,
+    (state, payload) => omit(state, getWampSubscriptionKey(payload.params))
+  )
 
 ;

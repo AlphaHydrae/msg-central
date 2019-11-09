@@ -4,13 +4,11 @@ import { combineEpics } from 'redux-observable';
 import WebSocket from 'ws';
 
 import { connectToWampRouterEpic, disconnectFromWampRouterEpic, resubscribeToWampTopicsEpic, submitWampConnectionFormEpic, submitWampSubscriptionFormEpic, subscribeToWampTopicEpic, unsubscribeFromWampTopicEpic } from '../domain/wamp/wamp.epics';
-import { Dictionary } from '../utils/types';
 import { AppState } from './state';
 
 export interface AppEpicDependencies {
-  wamp?: Connection;
-  wampSubscriptions: Dictionary<Subscription>;
-  ws?: WebSocket;
+  wamp: Map<string, { connection: Connection; subscriptions: Map<string, Subscription> }>;
+  ws: Map<string, WebSocket>;
 }
 
 export const rootEpic = combineEpics<AnyAction, AnyAction, AppState, AppEpicDependencies>(
