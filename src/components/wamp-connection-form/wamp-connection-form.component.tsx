@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 
-import { FormCheckboxChangeEvent, FormInputChangeEvent, FormSelectChangeEvent, FormSubmitEvent, isFormValid } from '../../utils/forms';
+import { FormCheckboxChangeEvent, FormInputChangeEvent, FormSelectChangeEvent, FormSubmitEvent, isFormInvalid, isFieldInvalid } from '../../utils/forms';
 import { WampConnectionFormState, WampConnectionFormValidations } from './wamp-connection-form.state';
 
 export interface WampConnectionFormDispatchProps {
@@ -22,9 +22,6 @@ export interface WampConnectionFormStateProps {
 }
 
 export function WampConnectionForm(props: WampConnectionFormDispatchProps & WampConnectionFormStateProps) {
-
-  const valid = isFormValid(props.validations);
-
   return (
     <Card>
       <Card.Header>WAMP Connection</Card.Header>
@@ -34,18 +31,18 @@ export function WampConnectionForm(props: WampConnectionFormDispatchProps & Wamp
             <Form.Label>Router URL</Form.Label>
             <Form.Control
               type='text'
-              isInvalid={!props.validations.routerUrlPresent || !props.validations.routerUrlValid}
+              isInvalid={isFieldInvalid(props.validations.routerUrl)}
               onChange={props.editRouterUrl}
               placeholder='wss://wamp.example.com/ws'
               readOnly={props.connecting}
               value={props.form.routerUrl}
             />
-            {!props.validations.routerUrlPresent && (
+            {props.validations.routerUrl.required && (
               <Form.Text className='text-danger'>
                 The URL of the WAMP router is required.
               </Form.Text>
             )}
-            {!props.validations.routerUrlValid && (
+            {!props.validations.routerUrl.required && props.validations.routerUrl.valid && (
               <Form.Text className='text-danger'>
                 Must be a valid WebSocket URL with the <code>ws://</code> or <code>wss://</code> protocol.
               </Form.Text>
@@ -56,13 +53,13 @@ export function WampConnectionForm(props: WampConnectionFormDispatchProps & Wamp
             <Form.Label>Realm</Form.Label>
             <Form.Control
               type='text'
+              isInvalid={isFieldInvalid(props.validations.realm)}
               onChange={props.editRealm}
               placeholder='realm1'
               readOnly={props.connecting}
-              isInvalid={!props.validations.realmPresent}
               value={props.form.realm}
             />
-            {!props.validations.realmPresent && (
+            {props.validations.realm.required && (
               <Form.Text className='text-danger'>
                 The WAMP realm to connect to is required.
               </Form.Text>
@@ -98,7 +95,7 @@ export function WampConnectionForm(props: WampConnectionFormDispatchProps & Wamp
 
           {props.form.authMethod && <WampAuthForm {...props} />}
 
-          <Button disabled={props.connecting || !valid} type='submit' variant='primary'>
+          <Button disabled={props.connecting || isFormInvalid(props.validations)} type='submit' variant='primary'>
             Connect
           </Button>
         </Form>
@@ -118,13 +115,13 @@ function WampAuthForm(props: WampConnectionFormDispatchProps & WampConnectionFor
         <Form.Label>Ticket</Form.Label>
         <Form.Control
           type='password'
-          isInvalid={!props.validations.authTicketPresent}
+          isInvalid={isFieldInvalid(props.validations.authTicket)}
           onChange={props.editAuthTicket}
           placeholder='Your secret ticket...'
           readOnly={props.connecting}
           value={params.authTicket}
         />
-        {!props.validations.authTicketPresent && (
+        {props.validations.authTicket.required && (
           <Form.Text className='text-danger'>
             The ticket to authenticate with is required.
           </Form.Text>
@@ -139,13 +136,13 @@ function WampAuthForm(props: WampConnectionFormDispatchProps & WampConnectionFor
         <Form.Label>Identifier</Form.Label>
         <Form.Control
           type='text'
-          isInvalid={!props.validations.authIdPresent}
+          isInvalid={isFieldInvalid(props.validations.authId)}
           onChange={props.editAuthId}
           placeholder='Your authentication ID...'
           readOnly={props.connecting}
           value={params.authId}
         />
-        {!props.validations.authIdPresent && (
+        {props.validations.authId.required && (
           <Form.Text className='text-danger'>
             An authentication ID is required.
           </Form.Text>

@@ -1,15 +1,15 @@
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Field as FormikField, Form as FormikForm, FormikProps, withFormik } from 'formik';
 import React from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 
-import { FormInputChangeEvent } from '../../utils/forms';
-import { WampSubscriptionFormState } from './wamp-subscription-form.state';
+import { FormInputChangeEvent, FormSubmitEvent, isFormInvalid } from '../../utils/forms';
+import { WampSubscriptionFormState, WampSubscriptionFormValidations } from './wamp-subscription-form.state';
 
 export interface WampSubscriptionFormStateProps {
   readonly form: WampSubscriptionFormState;
   readonly subscribing: boolean;
+  readonly validations: WampSubscriptionFormValidations;
 }
 
 export interface WampSubscriptionFormDispatchProps {
@@ -17,45 +17,34 @@ export interface WampSubscriptionFormDispatchProps {
   readonly subscribe: (values: WampSubscriptionFormState) => void;
 }
 
-export type WampSubscriptionFormProps = WampSubscriptionFormDispatchProps & WampSubscriptionFormStateProps;
+export interface WampSubscriptionFormProps extends WampSubscriptionFormDispatchProps, WampSubscriptionFormStateProps {
+  readonly submit: (event: FormSubmitEvent) => void;
+}
 
 export function WampSubscriptionForm(props: WampSubscriptionFormProps) {
   return (
     <Card>
       <Card.Header>Subscribe to a WAMP topic</Card.Header>
       <Card.Body>
-        <OuterForm {...props} />
+        <Form onSubmit={props.submit}>
+          <Form.Group controlId='topic'>
+            <Form.Label>Topic</Form.Label>
+            <Form.Control
+              type='text'
+              onChange={props.editTopic}
+              placeholder='com.example.notifications'
+              readOnly={props.subscribing}
+              value={props.form.topic}
+            />
+          </Form.Group>
+
+          <Button disabled={props.subscribing || isFormInvalid(props.validations)} type='submit' variant='primary'>
+            <FontAwesomeIcon icon={faSignInAlt} />
+            {' '}
+            Subscribe
+          </Button>
+        </Form>
       </Card.Body>
     </Card>
-  );
-}
-
-const OuterForm = withFormik<WampSubscriptionFormProps, WampSubscriptionFormState>({
-  mapPropsToValues: formikProps => formikProps.form,
-  handleSubmit: (values, form) => form.props.subscribe(values)
-})(InnerForm);
-
-function InnerForm(props: FormikProps<WampSubscriptionFormState> & WampSubscriptionFormProps) {
-  return (
-    <FormikForm>
-
-      <Form.Group controlId='topic'>
-        <Form.Label>Topic</Form.Label>
-        <FormikField
-          as={Form.Control}
-          type='text'
-          placeholder='com.example.notifications'
-          readOnly={props.subscribing}
-          value={props.values.topic}
-        />
-      </Form.Group>
-
-      <Button disabled={props.subscribing} type='submit' variant='primary'>
-        <FontAwesomeIcon icon={faSignInAlt} />
-        {' '}
-        Subscribe
-      </Button>
-
-    </FormikForm>
   );
 }

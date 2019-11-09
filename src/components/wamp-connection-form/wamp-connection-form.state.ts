@@ -1,3 +1,6 @@
+import { FormValidations } from '../../utils/forms';
+import { RequiredValidation } from '../../utils/validations';
+
 export interface WampConnectionFormState {
   readonly routerUrl: string;
   readonly realm: string;
@@ -8,12 +11,13 @@ export interface WampConnectionFormState {
   readonly saveAuth: boolean;
 }
 
-export interface WampConnectionFormValidations {
-  readonly authIdPresent: boolean;
-  readonly authTicketPresent: boolean;
-  readonly realmPresent: boolean;
-  readonly routerUrlPresent: boolean;
-  readonly routerUrlValid: boolean;
+export interface WampConnectionFormValidations extends FormValidations {
+  readonly authId: RequiredValidation;
+  readonly authTicket: RequiredValidation;
+  readonly realm: RequiredValidation;
+  readonly routerUrl: RequiredValidation & {
+    readonly valid: boolean;
+  };
 }
 
 export const initialWampConnectionFormState: WampConnectionFormState = {

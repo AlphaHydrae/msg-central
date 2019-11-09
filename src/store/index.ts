@@ -5,6 +5,7 @@ import { createLogger } from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
 
 import { editWampConnectionForm } from '../components/wamp-connection-form/wamp-connection-form.actions';
+import { editWampSubscriptionForm } from '../components/wamp-subscription-form/wamp-subscription-form.actions';
 import { AppEpicDependencies, rootEpic } from './epics';
 import { history } from './history';
 import { rootReducer } from './reducers';
@@ -12,7 +13,8 @@ import { AppState } from './state';
 import { createStorageMiddleware } from './storage';
 
 const silentActionTypes = [
-  editWampConnectionForm
+  editWampConnectionForm,
+  editWampSubscriptionForm
 ].map(creator => creator.type);
 
 export function configureStore() {
