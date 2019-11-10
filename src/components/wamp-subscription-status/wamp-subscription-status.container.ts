@@ -1,11 +1,11 @@
 import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
-import { selectEventsFromMostRecent } from '../../concerns/data/data.selectors';
 import { deleteWampTopicSubscription, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
-import { WampSubscriptionParams, WampSubscriptionStatus } from '../../domain/wamp/wamp.state';
+import { selectActiveWampSubscriptions } from '../../domain/wamp/wamp.selectors';
+import { WampSubscriptionParams } from '../../domain/wamp/wamp.state';
 import { selectCommunicationState } from '../../store/selectors';
 import { AppState } from '../../store/state';
-import { WampSubscriptionStatusComponent, WampSubscriptionStatusDispatchProps, WampSubscriptionStatusOwnProps, WampSubscriptionStatusStateProps } from './wamp-subscription-status.component';
+import { WampSubscriptionStatus, WampSubscriptionStatusComponent, WampSubscriptionStatusDispatchProps, WampSubscriptionStatusOwnProps, WampSubscriptionStatusStateProps } from './wamp-subscription-status.component';
 
 const mapStateToProps: MapStateToProps<WampSubscriptionStatusStateProps, WampSubscriptionStatusOwnProps, AppState> = (state, props) => ({
   status: getWampSubscriptionStatus(props.subscription, state)
@@ -23,24 +23,18 @@ export const WampSubscriptionStatusContainer = connect(
 
 function getWampSubscriptionStatus(subscription: WampSubscriptionParams, state: AppState): WampSubscriptionStatus {
 
-  const events = selectEventsFromMostRecent(state);
-  const lastConnectionEventIndex = events.findIndex(event => event.type === 'wampConnectionClosed' || event.type === 'wampConnectionOpen');
-  if (lastConnectionEventIndex < 0 || events[lastConnectionEventIndex].type !== 'wampConnectionOpen') {
-    return 'unsubscribed';
-  }
-
-  for (const event of events.slice(0, lastConnectionEventIndex)) {
-    if (event.type === 'wampTopicSubscribed' && event.subscription.id === subscription.id) {
-      return 'subscribed';
-    }
-  }
-
-  for (const action of selectCommunicationState(state)) {
-    if (subscribeToWampTopic.started.match(action) && action.payload.id === subscription.id) {
+  const communications = selectCommunicationState(state);
+  for (const comm of communications) {
+    if (subscribeToWampTopic.started.match(comm)) {
       return 'subscribing';
-    } else if (unsubscribeFromWampTopic.started.match(action) && action.payload.id === subscription.id) {
+    } else if (unsubscribeFromWampTopic.started.match(comm)) {
       return 'unsubscribing';
     }
+  }
+
+  const active = selectActiveWampSubscriptions(state);
+  if (active.some(sub => sub.id === subscription.id)) {
+    return 'subscribed';
   }
 
   return 'unsubscribed';

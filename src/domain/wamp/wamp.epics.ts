@@ -1,4 +1,4 @@
-import { Connection, Error as AutobahnError, IConnectionOptions, Subscription } from 'autobahn';
+import { Connection, IConnectionOptions, Subscription } from 'autobahn';
 import { constant } from 'lodash';
 import { Action } from 'redux';
 import { from, Observable, Observer, of, throwError } from 'rxjs';
@@ -6,11 +6,12 @@ import { catchError, filter, first, ignoreElements, map, mergeMap, switchMap, sw
 
 import { AppEpicDependencies } from '../../store/epics';
 import { loadSavedState } from '../../store/storage';
-import { createEpic } from '../../utils/store';
-import { callWampProcedure, connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampClientError } from './wamp.actions';
+import { createEpic, serializeError } from '../../utils/store';
+import { callWampProcedure, connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic } from './wamp.actions';
 import { WampConnectionParams } from './wamp.connection-params';
 import { selectWampConnections, selectWampSubscriptions } from './wamp.selectors';
 import { WampCallParams, WampErrorType, WampSubscriptionParams } from './wamp.state';
+import { serializeWampClientError } from './wamp.utils';
 
 export const callWampProcedureEpic = createEpic((action$, _, deps) => action$.pipe(
   filter(callWampProcedure.started.match),
@@ -183,46 +184,4 @@ function createErrorHandler(type: WampErrorType, observer: Observer<Action>) {
     customErrorMessage: serializeError(customErrorMessage),
     error: serializeError(error)
   }));
-}
-
-function serializeError(err: unknown) {
-  if (typeof err === 'string') {
-    return err;
-  } else if (err instanceof Error) {
-    return {
-      message: err.message,
-      stack: err.stack
-    };
-  }
-
-  return JSON.stringify(err);
-}
-
-function serializeWampClientError(err: unknown): WampClientError {
-  if (typeof err === 'string') {
-    return {
-      message: err,
-      args: [],
-      kwargs: {}
-    };
-  } else if (err instanceof AutobahnError) {
-    return {
-      message: err.error,
-      args: err.args,
-      kwargs: err.kwargs
-    };
-  } else if (err instanceof Error) {
-    return {
-      message: err.message,
-      stack: err.stack,
-      args: [],
-      kwargs: {}
-    };
-  }
-
-  return {
-    message: 'An unexpected error occurred',
-    args: [],
-    kwargs: {}
-  };
 }

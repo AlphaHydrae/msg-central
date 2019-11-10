@@ -21,6 +21,7 @@ connection.onclose = () => {
 connection.onopen = session => {
 
   session.register('com.example.add2', args => args[0] + args[1]).catch(handleError);
+  session.register('com.example.foo', (args, kwargs) => kwargs.foo.bar).catch(handleError);
 
   intervals.push(setInterval(
     () => session.publish(

@@ -10,8 +10,8 @@ const mapStateToProps: MapStateToProps<EventLineStateProps, EventLineOwnProps, A
 });
 
 const mapDispatchToProps: MapDispatchToProps<EventLineDispatchProps, EventLineOwnProps> = (dispatch, ownProps) => ({
-  hide: () => dispatch(hideEventDetails(ownProps.event)),
-  show: () => dispatch(showEventDetails(ownProps.event))
+  hide: () => dispatch(hideEventDetails(ownProps.event.id)),
+  show: () => dispatch(showEventDetails(ownProps.event.id))
 });
 
 const mergeProps: MergeProps<

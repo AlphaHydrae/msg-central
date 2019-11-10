@@ -87,7 +87,7 @@ export function WampCallFormComponent(props: WampCallFormProps) {
           <Button disabled={!props.connection || props.calling || isFormInvalid(props.validations)} type='submit' variant='primary'>
             <FontAwesomeIcon icon={faPlay} />
             {' '}
-            Subscribe
+            Call
           </Button>
 
         </Form>

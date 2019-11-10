@@ -5,7 +5,7 @@ import { AppEvent } from '../../concerns/data/data.state';
 import { EventLineContainer } from '../event-line/event-line.container';
 
 export interface EventLogStateProps {
-  readonly events: AppEvent[];
+  readonly events: Array<AppEvent<any>>;
   readonly expandedEventIds: string[];
 }
 

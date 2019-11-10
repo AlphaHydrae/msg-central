@@ -11,6 +11,11 @@ export const selectActiveWampConnections = createSelector(
   data => data.activeWampConnections
 );
 
+export const selectActiveWampSubscriptions = createSelector(
+  selectDataState,
+  data => data.activeWampSubscriptions
+);
+
 export const selectConnectingToWampRouter = createCommunicationActionInProgressSelector(connectToWampRouter);
 
 export const selectConnectToWampRouterAction = createCommunicationActionSelector(connectToWampRouter);

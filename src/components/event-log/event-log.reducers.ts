@@ -9,12 +9,12 @@ const expandedEventIdsReducer = reducerWithInitialState(initialEventLogState.exp
 
   .case(
     hideEventDetails,
-    (state, payload) => without(state, payload.id)
+    without
   )
 
   .case(
     showEventDetails,
-    (state, payload) => [ ...state, payload.id ]
+    (state, payload) => [ ...state, payload ]
   )
 
 ;

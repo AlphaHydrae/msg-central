@@ -32,6 +32,19 @@ export const createAsyncAction = <Params, Result, Error>(type: ActionType) => {
   return action;
 };
 
+export function serializeError(err: unknown) {
+  if (typeof err === 'string') {
+    return err;
+  } else if (err instanceof Error) {
+    return {
+      message: err.message,
+      stack: err.stack
+    };
+  }
+
+  return JSON.stringify(err);
+}
+
 function registerActionType(type: string) {
   if (registeredActionTypes.includes(type)) {
     throw new Error(`Action type "${type}" has already been registered`);

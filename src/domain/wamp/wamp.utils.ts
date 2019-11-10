@@ -1,9 +1,32 @@
-import { createEvent } from '../events/events.utils';
-import { WampEventBase } from './wamp.events';
+import { Error as AutobahnError } from 'autobahn';
 
-export function createWampEvent<T extends object>(value: T): T & WampEventBase {
+import { WampClientError } from './wamp.actions';
+
+export function serializeWampClientError(err: unknown): WampClientError {
+  if (typeof err === 'string') {
+    return {
+      message: err,
+      args: [],
+      kwargs: {}
+    };
+  } else if (err instanceof AutobahnError) {
+    return {
+      message: err.error,
+      args: err.args,
+      kwargs: err.kwargs
+    };
+  } else if (err instanceof Error) {
+    return {
+      message: err.message,
+      stack: err.stack,
+      args: [],
+      kwargs: {}
+    };
+  }
+
   return {
-    ...createEvent(value),
-    protocol: 'wamp'
+    message: 'An unexpected error occurred',
+    args: [],
+    kwargs: {}
   };
 }

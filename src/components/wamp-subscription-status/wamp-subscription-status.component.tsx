@@ -2,8 +2,10 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import { ListGroup, ListGroupItemProps } from 'react-bootstrap';
 
-import { WampSubscriptionParams, WampSubscriptionStatus } from '../../domain/wamp/wamp.state';
+import { WampSubscriptionParams } from '../../domain/wamp/wamp.state';
 import { IconButton } from '../icon-button';
+
+export type WampSubscriptionStatus = 'subscribed' | 'subscribing' | 'unsubscribed' | 'unsubscribing';
 
 export interface WampSubscriptionStatusDispatchProps {
   readonly delete: () => void;
