@@ -1,3 +1,11 @@
+export interface WampCallParams {
+  readonly args: unknown[];
+  readonly connectionId: string;
+  readonly id: string;
+  readonly kwargs: unknown;
+  readonly procedure: string;
+}
+
 export interface WampError {
   readonly type: WampErrorType;
   readonly error: unknown;

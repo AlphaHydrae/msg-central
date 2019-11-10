@@ -1,6 +1,6 @@
 import { createAction, createAsyncAction } from '../../utils/store';
 import { WampConnectionParams } from './wamp.connection-params';
-import { WampError, WampSubscriptionParams, WampTopicEvent } from './wamp.state';
+import { WampCallParams, WampError, WampSubscriptionParams, WampTopicEvent } from './wamp.state';
 
 export interface HandleWampTopicEventParams {
   readonly connectionId: string;
@@ -26,6 +26,7 @@ export interface WampClientError {
   readonly kwargs: unknown;
 }
 
+export const callWampProcedure = createAsyncAction<WampCallParams, unknown, WampClientError>('CALL_WAMP_PROCEDURE');
 export const connectToWampRouter = createAsyncAction<WampConnectionParams, void, WampConnectionError>('CONNECT_TO_WAMP_ROUTER');
 export const deleteWampConnection = createAction<WampConnectionParams>('DELETE_WAMP_CONNECTION');
 export const deleteWampTopicSubscription = createAction<WampSubscriptionParams>('DELETE_WAMP_TOPIC_SUBSCRIPTION');

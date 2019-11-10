@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 
-import { Card } from 'react-bootstrap';
+import { WampCallFormContainer } from '../wamp-call-form/wamp-call-form.container';
 import { WampConnectionFormContainer } from '../wamp-connection-form/wamp-connection-form.container';
 import { WampSubscriptionFormContainer } from '../wamp-subscription-form/wamp-subscription-form.container';
 
@@ -15,10 +15,7 @@ export function WampControls(props: WampControlsStateProps) {
       {props.connectionControlsEnabled && (
         <Fragment>
           <WampSubscriptionFormContainer />
-          <Card className='mt-3'>
-            <Card.Header>Call a WAMP procedure</Card.Header>
-            <Card.Body>Hello</Card.Body>
-          </Card>
+          <WampCallFormContainer />
         </Fragment>
       )}
     </Fragment>

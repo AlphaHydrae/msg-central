@@ -20,13 +20,13 @@ connection.onclose = () => {
 
 connection.onopen = session => {
 
-  session.subscribe('com.example.add2', args => args[0] + args[1]).catch(handleError);
+  session.register('com.example.add2', args => args[0] + args[1]).catch(handleError);
 
   intervals.push(setInterval(
     () => session.publish(
       'com.example.notifications',
-      [ 'arg1', 'arg2' ],
-      { key1: 'value1', key2: 'value2' },
+      [ Math.random() ],
+      { time: new Date().toISOString() },
       { acknowledge: true }
     ).then(() => console.log('Published event to com.example.notifications')).catch(handleError),
     10000

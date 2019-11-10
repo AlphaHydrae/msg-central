@@ -7,10 +7,17 @@ import { catchError, filter, first, ignoreElements, map, mergeMap, switchMap, sw
 import { AppEpicDependencies } from '../../store/epics';
 import { loadSavedState } from '../../store/storage';
 import { createEpic } from '../../utils/store';
-import { connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampClientError } from './wamp.actions';
+import { callWampProcedure, connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampClientError } from './wamp.actions';
 import { WampConnectionParams } from './wamp.connection-params';
 import { selectWampConnections, selectWampSubscriptions } from './wamp.selectors';
-import { WampErrorType, WampSubscriptionParams } from './wamp.state';
+import { WampCallParams, WampErrorType, WampSubscriptionParams } from './wamp.state';
+
+export const callWampProcedureEpic = createEpic((action$, _, deps) => action$.pipe(
+  filter(callWampProcedure.started.match),
+  mergeMap(action => callProcedure(action.payload, deps).pipe(
+    catchError(err => of(callWampProcedure.failed({ params: action.payload, error: serializeWampClientError(err) })))
+  ))
+));
 
 export const connectToWampRouterEpic = createEpic((action$, _, deps) => action$.pipe(
   filter(connectToWampRouter.started.match),
@@ -56,6 +63,23 @@ export const unsubscribeFromWampTopicEpic = createEpic((action$, _, deps) => act
     catchError(err => of(unsubscribeFromWampTopic.failed({ params: action.payload, error: serializeWampClientError(err) })))
   ))
 ));
+
+function callProcedure(params: WampCallParams, deps: AppEpicDependencies): Observable<Action> {
+
+  const wamp = deps.wamp.get(params.connectionId);
+  if (!wamp) {
+    return throwError(new Error(`WAMP connection ${params.connectionId} unavailable`));
+  }
+
+  const session = wamp.connection.session;
+  if (!session) {
+    return throwError(new Error(`WAMP session unavailable for connection ${params.connectionId}`));
+  }
+
+  return from(session.call(params.procedure, params.args, params.kwargs).then(result => {
+    return callWampProcedure.done({ params, result });
+  }));
+}
 
 function connect(params: WampConnectionParams, deps: AppEpicDependencies): Observable<Action> {
   return new Observable(observer => {

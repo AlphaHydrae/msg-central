@@ -8,7 +8,7 @@ import { preventDefault } from '../../utils/forms';
 import { isBlank } from '../../utils/validations';
 import { editWampSubscriptionForm } from './wamp-subscription-form.actions';
 import { WampSubscriptionForm, WampSubscriptionFormDispatchProps, WampSubscriptionFormProps, WampSubscriptionFormStateProps } from './wamp-subscription-form.component';
-import { selectWampSubscriptionFormState } from './wamp-subscription-form.selectors';
+import { selectWampSubscriptionFormState, selectWampSubscriptionInProgress } from './wamp-subscription-form.selectors';
 
 const mapStateToProps: MapStateToProps<WampSubscriptionFormStateProps, {}, AppState> = state => {
 
@@ -18,7 +18,7 @@ const mapStateToProps: MapStateToProps<WampSubscriptionFormStateProps, {}, AppSt
   return {
     form,
     connection: connection !== undefined && selectActiveWampConnections(state).includes(connection.id) ? connection : undefined,
-    subscribing: false,
+    subscribing: selectWampSubscriptionInProgress(state),
     topicPrefix: connection ? connection.namespace : undefined,
     validations: {
       topic: {
