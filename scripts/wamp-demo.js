@@ -41,15 +41,24 @@ const wss = new WebSocket.Server({
   port: process.env.WS_SERVER_PORT || 5001
 });
 
+const wsClients = [];
+
 wss.on('connection', ws => {
+  wsClients.push(ws);
+
+  ws.on('close', () => wsClients.splice(wsClients.indexOf(ws), 1));
+
   ws.on('message', message => {
-    if (message === 'ping') {
+    console.log(`WebSocket message received: ${message}`);
+    if (message === JSON.stringify('ping')) {
       ws.send('pong');
     }
   });
 
   ws.send(JSON.stringify({ hello: 'world' }));
 });
+
+setInterval(() => wsClients.forEach(ws => ws.send(JSON.stringify({ time: new Date().toISOString() }))), 10000);
 
 function handleWampError(err) {
   console.error('WAMP error', err);

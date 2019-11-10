@@ -5,7 +5,7 @@ import { filter, first, ignoreElements, map, mergeMap, switchMap, switchMapTo, t
 import { AppEpicDependencies } from '../../store/epics';
 import { loadSavedState } from '../../store/storage';
 import { createEpic } from '../../utils/store';
-import { connectToWsServer, disconnectFromWsServer, handleWsConnectionClosed, handleWsMessage } from './ws.actions';
+import { connectToWsServer, disconnectFromWsServer, handleWsConnectionClosed, handleWsMessage, sendWsMessage, SendWsMessageParams } from './ws.actions';
 import { selectWsConnections } from './ws.selectors';
 import { WsConnectionParams } from './ws.state';
 
@@ -32,6 +32,12 @@ export const reconnectToWsServerEpic = createEpic((action$, state$) => action$.p
   filter(loadSavedState.match),
   switchMapTo(state$.pipe(map(selectWsConnections), first())),
   switchMap(connections => from(connections.map(conn => connectToWsServer.started(conn))))
+));
+
+export const sendWsMessageEpic = createEpic((action$, _, deps) => action$.pipe(
+  filter(sendWsMessage.match),
+  tap(action => sendMessage(action.payload, deps)),
+  ignoreElements()
 ));
 
 function connect(params: WsConnectionParams, deps: AppEpicDependencies): Observable<Action> {
@@ -73,4 +79,14 @@ function connect(params: WsConnectionParams, deps: AppEpicDependencies): Observa
       deps.ws.delete(params.id);
     };
   });
+}
+
+function sendMessage(params: SendWsMessageParams, deps: AppEpicDependencies) {
+
+  const ws = deps.ws.get(params.connectionId);
+  if (!ws) {
+    return console.warn(`WebSocket connection ${params.connectionId} unavailable`);
+  }
+
+  ws.send(params.message.data);
 }

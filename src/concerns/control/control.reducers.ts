@@ -7,6 +7,7 @@ import { wampCallFormReducer } from '../../components/wamp-call-form/wamp-call-f
 import { wampConnectionFormReducer } from '../../components/wamp-connection-form/wamp-connection-form.reducers';
 import { wampSubscriptionFormReducer } from '../../components/wamp-subscription-form/wamp-subscription-form.reducers';
 import { wsConnectionFormReducer } from '../../components/ws-connection-form/ws-connection-form.reducers';
+import { wsMessageFormReducer } from '../../components/ws-message-form/ws-message-form.reducers';
 import { loadSavedState } from '../../store/storage';
 import { ControlState, initialControlState } from './control.state';
 
@@ -20,5 +21,6 @@ export const controlReducer = combineReducers<ControlState>({
   wampCallForm: wampCallFormReducer,
   wampConnectionForm: wampConnectionFormReducer,
   wampSubscriptionForm: wampSubscriptionFormReducer,
-  wsConnectionForm: wsConnectionFormReducer
+  wsConnectionForm: wsConnectionFormReducer,
+  wsMessageForm: wsMessageFormReducer
 });

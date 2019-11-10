@@ -3,6 +3,7 @@ import { initialWampCallFormState, WampCallFormState } from '../../components/wa
 import { initialWampConnectionFormState, WampConnectionFormState } from '../../components/wamp-connection-form/wamp-connection-form.state';
 import { initialWampSubscriptionFormState, WampSubscriptionFormState } from '../../components/wamp-subscription-form/wamp-subscription-form.state';
 import { initialWsConnectionFormState, WsConnectionFormState } from '../../components/ws-connection-form/ws-connection-form.state';
+import { initialWsMessageFormState, WsMessageFormState } from '../../components/ws-message-form/ws-message-form.state';
 
 export interface ControlState {
   readonly eventLog: EventLogState;
@@ -11,6 +12,7 @@ export interface ControlState {
   readonly wampConnectionForm: WampConnectionFormState;
   readonly wampSubscriptionForm: WampSubscriptionFormState;
   readonly wsConnectionForm: WsConnectionFormState;
+  readonly wsMessageForm: WsMessageFormState;
 }
 
 export const initialControlState: ControlState = {
@@ -19,5 +21,6 @@ export const initialControlState: ControlState = {
   wampCallForm: initialWampCallFormState,
   wampConnectionForm: initialWampConnectionFormState,
   wampSubscriptionForm: initialWampSubscriptionFormState,
-  wsConnectionForm: initialWsConnectionFormState
+  wsConnectionForm: initialWsConnectionFormState,
+  wsMessageForm: initialWsMessageFormState
 };

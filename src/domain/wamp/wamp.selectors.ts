@@ -23,9 +23,7 @@ export const selectConnectToWampRouterAction = createCommunicationActionSelector
 export const selectCurrentWampConnection = createSelector(
   selectActiveWampConnections,
   selectWampConnectionsDictionary,
-  (active, connections) => {
-    return active.map(id => connections[id])[0];
-  }
+  (active, connections) => active.map(id => connections[id])[0]
 );
 
 export const selectWampConnections = createSelector(

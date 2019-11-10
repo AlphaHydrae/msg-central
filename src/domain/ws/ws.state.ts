@@ -1,8 +1,11 @@
+export type WsMessage = WsTextMessage;
+
 export interface WsConnectionParams {
   readonly id: string;
   readonly serverUrl: string;
 }
 
-export interface WsMessage {
-  readonly text: unknown;
+export interface WsTextMessage {
+  readonly type: 'text';
+  readonly data: string;
 }

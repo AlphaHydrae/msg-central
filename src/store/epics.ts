@@ -3,7 +3,7 @@ import { AnyAction } from 'redux';
 import { combineEpics } from 'redux-observable';
 
 import { callWampProcedureEpic, connectToWampRouterEpic, disconnectFromWampRouterEpic, reconnectToWampRouterEpic, resubscribeToWampTopicsEpic, subscribeToWampTopicEpic, unsubscribeFromWampTopicEpic } from '../domain/wamp/wamp.epics';
-import { connectToWsServerEpic, disconnectFromWsServerEpic, reconnectToWsServerEpic } from '../domain/ws/ws.epics';
+import { connectToWsServerEpic, disconnectFromWsServerEpic, reconnectToWsServerEpic, sendWsMessageEpic } from '../domain/ws/ws.epics';
 import { AppState } from './state';
 
 export interface AppEpicDependencies {
@@ -20,6 +20,7 @@ export const rootEpic = combineEpics<AnyAction, AnyAction, AppState, AppEpicDepe
   reconnectToWampRouterEpic,
   reconnectToWsServerEpic,
   resubscribeToWampTopicsEpic,
+  sendWsMessageEpic,
   subscribeToWampTopicEpic,
   unsubscribeFromWampTopicEpic
 );

@@ -1,5 +1,5 @@
 import { callWampProcedure, connectToWampRouter, handleWampConnectionClosed, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
-import { connectToWsServer, handleWsConnectionClosed, handleWsMessage } from '../../domain/ws/ws.actions';
+import { connectToWsServer, handleWsConnectionClosed, handleWsMessage, sendWsMessage } from '../../domain/ws/ws.actions';
 
 export const eventActionTypes = [
   callWampProcedure.done,
@@ -12,6 +12,7 @@ export const eventActionTypes = [
   handleWampTopicEvent,
   handleWsConnectionClosed,
   handleWsMessage,
+  sendWsMessage,
   subscribeToWampTopic.done,
   unsubscribeFromWampTopic.done
 ].map(creator => creator.type);

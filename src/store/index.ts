@@ -8,6 +8,7 @@ import { editWampCallForm } from '../components/wamp-call-form/wamp-call-form.ac
 import { editWampConnectionForm } from '../components/wamp-connection-form/wamp-connection-form.actions';
 import { editWampSubscriptionForm } from '../components/wamp-subscription-form/wamp-subscription-form.actions';
 import { editWsConnectionForm } from '../components/ws-connection-form/ws-connection-form.actions';
+import { editWsMessageForm } from '../components/ws-message-form/ws-message-form.actions';
 import { AppEpicDependencies, rootEpic } from './epics';
 import { history } from './history';
 import { rootReducer } from './reducers';
@@ -18,7 +19,8 @@ const silentActionTypes = [
   editWampCallForm,
   editWampConnectionForm,
   editWampSubscriptionForm,
-  editWsConnectionForm
+  editWsConnectionForm,
+  editWsMessageForm
 ].map(creator => creator.type);
 
 export function configureStore() {

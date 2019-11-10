@@ -1,4 +1,5 @@
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faLongArrowAltDown, faLongArrowAltUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import React from 'react';
 import { Collapse, ListGroup, ListGroupItemProps, OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -7,7 +8,7 @@ import { Action, Success } from 'typescript-fsa';
 import { AppEvent } from '../../concerns/data/data.state';
 import { callWampProcedure, connectToWampRouter, handleWampConnectionClosed, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampConnectionClosedParams } from '../../domain/wamp/wamp.actions';
 import { WampCallParams, WampTopicEvent } from '../../domain/wamp/wamp.state';
-import { connectToWsServer, handleWsConnectionClosed, handleWsMessage, HandleWsMessageParams } from '../../domain/ws/ws.actions';
+import { connectToWsServer, handleWsConnectionClosed, handleWsMessage, HandleWsMessageParams, sendWsMessage, SendWsMessageParams } from '../../domain/ws/ws.actions';
 import { IconButton } from '../icon-button';
 
 export interface EventLineDispatchProps {
@@ -123,31 +124,6 @@ function getWampEventDetails(action: Action<any>) {
   return { description, details, variant };
 }
 
-function getWsEventDetails(action: Action<any>) {
-
-  let description;
-  let details;
-  let variant: ListGroupItemProps['variant'] = 'info';
-
-  if (connectToWsServer.done.match(action)) {
-    description = <span>Connected to WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
-    variant = 'success';
-  } else if (connectToWsServer.failed.match(action)) {
-    description = <span>Error connecting to WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
-    variant = 'danger';
-  } else if (handleWsConnectionClosed.match(action)) {
-    description = <span>Disconnected from WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
-    variant = 'secondary';
-  } else if (handleWsMessage.match(action)) {
-    description = <span>Received WebSocket message</span>;
-    details = getWsMessageDetails(action);
-  } else {
-    return;
-  }
-
-  return { description, details, variant };
-}
-
 function getWampConnectionClosedDetails(action: Action<WampConnectionClosedParams>) {
 
   let description;
@@ -206,6 +182,46 @@ function getWampTopicEventDetails(event: WampTopicEvent) {
   );
 }
 
+function getWsEventDetails(action: Action<any>) {
+
+  let description;
+  let details;
+  let variant: ListGroupItemProps['variant'] = 'info';
+
+  if (connectToWsServer.done.match(action)) {
+    description = <span>Connected to WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
+    variant = 'success';
+  } else if (connectToWsServer.failed.match(action)) {
+    description = <span>Error connecting to WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
+    variant = 'danger';
+  } else if (handleWsConnectionClosed.match(action)) {
+    description = <span>Disconnected from WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
+    variant = 'secondary';
+  } else if (handleWsMessage.match(action)) {
+    description = (
+      <span>
+        <FontAwesomeIcon className='mr-1' icon={faLongArrowAltDown} />
+        {' '}
+        Received WebSocket message
+      </span>
+    );
+    details = getWsMessageDetails(action);
+  } else if (sendWsMessage.match(action)) {
+    description = (
+      <span>
+        <FontAwesomeIcon className='mr-1' icon={faLongArrowAltUp} />
+        {' '}
+        Sent WebSocket message
+      </span>
+    );
+    details = getWsSentMessageDetails(action);
+  } else {
+    return;
+  }
+
+  return { description, details, variant };
+}
+
 function getWsMessageDetails(action: Action<HandleWsMessageParams>) {
 
   const data = action.payload.data;
@@ -225,6 +241,15 @@ function getWsMessageDetails(action: Action<HandleWsMessageParams>) {
     <div className='mt-2'>
       <strong>Message data</strong>
       <pre className='mt-1'>{description}</pre>
+    </div>
+  );
+}
+
+function getWsSentMessageDetails(action: Action<SendWsMessageParams>) {
+  return (
+    <div className='mt-2'>
+      <strong>Message data</strong>
+      <pre className='mt-1'>{action.payload.message.data}</pre>
     </div>
   );
 }

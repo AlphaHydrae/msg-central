@@ -1,5 +1,5 @@
 import { createAction, createAsyncAction } from '../../utils/store';
-import { WsConnectionParams } from './ws.state';
+import { WsConnectionParams, WsMessage } from './ws.state';
 
 export interface HandleWsConnectionClosedParams {
   readonly code: number;
@@ -12,6 +12,12 @@ export interface HandleWsMessageParams {
   readonly data: unknown;
 }
 
+export interface SendWsMessageParams {
+  readonly connectionId: string;
+  readonly id: string;
+  readonly message: WsMessage;
+}
+
 export interface WsClientError {
   readonly message: string;
   readonly stack?: string;
@@ -22,3 +28,4 @@ export const deleteWsConnection = createAction<WsConnectionParams>('DELETE_WS_CO
 export const disconnectFromWsServer = createAction<WsConnectionParams>('DISCONNECT_FROM_WS_SERVER');
 export const handleWsConnectionClosed = createAction<HandleWsConnectionClosedParams>('HANDLE_WS_CONNECTION_CLOSED');
 export const handleWsMessage = createAction<HandleWsMessageParams>('HANDLE_WS_MESSAGE');
+export const sendWsMessage = createAction<SendWsMessageParams>('SEND_WS_MESSAGE');
