@@ -6,7 +6,7 @@ const { path, port } = require('./config');
 
 const app = express();
 
-const logger = getLogger('asap');
+const logger = getLogger('msg-central');
 logger.level = 'TRACE';
 
 app.use(express.static(path('build')));

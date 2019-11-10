@@ -12,7 +12,7 @@ export function Navbar(props: NavbarStateProps) {
   return (
     <BootstrapNavbar bg='light' className='mb-3' expand='lg'>
       <LinkContainer to={'/'}>
-        <BootstrapNavbar.Brand>ASAP</BootstrapNavbar.Brand>
+        <BootstrapNavbar.Brand>MSG Central</BootstrapNavbar.Brand>
       </LinkContainer>
       {props.ready && (
         <Fragment>
@@ -33,7 +33,7 @@ export function Navbar(props: NavbarStateProps) {
                 )}
                 placement='left'
               >
-                <a className='text-secondary' href='https://github.com/AlphaHydrae/asap' rel='noopener noreferrer' target='_blank'>
+                <a className='text-secondary' href='https://github.com/AlphaHydrae/msg-central' rel='noopener noreferrer' target='_blank'>
                   <FontAwesomeIcon icon={faGithub} />
                 </a>
               </OverlayTrigger>

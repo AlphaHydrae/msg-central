@@ -1,2 +1,2 @@
 export const storageDebounceTime = 250;
-export const storageKey = 'asap';
+export const storageKey = 'msg-central';

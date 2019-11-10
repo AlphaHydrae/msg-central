@@ -4,7 +4,7 @@ const root = resolvePath(joinPath(__dirname, '..'));
 
 exports.path = (...segments) => joinPath(root, ...segments);
 
-exports.port = parseEnvInt('ASAP_PORT', 1, 65535) || parseEnvInt('PORT') || 3000;
+exports.port = parseEnvInt('MSG_CENTRAL_PORT', 1, 65535) || parseEnvInt('PORT') || 3000;
 
 function parseEnvInt(name, min, max) {
 
