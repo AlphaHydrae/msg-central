@@ -1,12 +1,11 @@
 import { connect, MapStateToProps } from 'react-redux';
 
-import { selectDataState } from '../../store/selectors';
 import { AppState } from '../../store/state';
 import { WampControls, WampControlsStateProps } from './wamp-controls.component';
+import { selectWampConnectionControlsEnabled } from './wamp-controls.selectors';
 
 export const mapStateToProps: MapStateToProps<WampControlsStateProps, {}, AppState> = state => ({
-  // FIXME: write selector
-  connected: selectDataState(state).activeWampConnections.length >= 1
+  connectionControlsEnabled: selectWampConnectionControlsEnabled(state)
 });
 
 export const mapDispatchToProps = () => ({});

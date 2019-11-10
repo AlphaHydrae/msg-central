@@ -1,11 +1,12 @@
 import React, { Fragment } from 'react';
 import { Button, Card, Form } from 'react-bootstrap';
 
+import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
 import { FormCheckboxChangeEvent, FormInputChangeEvent, FormSelectChangeEvent, FormSubmitEvent, isFieldInvalid, isFormInvalid } from '../../utils/forms';
 import { WampConnectionFormState, WampConnectionFormValidations } from './wamp-connection-form.state';
 
 export interface WampConnectionFormDispatchProps {
-  readonly connect: (event: FormSubmitEvent) => void;
+  readonly connect: (params: WampConnectionParams) => void;
   readonly editAuthId: (event: FormInputChangeEvent) => void;
   readonly editAuthMethod: (event: FormSelectChangeEvent) => void;
   readonly editAuthTicket: (event: FormInputChangeEvent) => void;
@@ -21,12 +22,16 @@ export interface WampConnectionFormStateProps {
   readonly validations: WampConnectionFormValidations;
 }
 
-export function WampConnectionForm(props: WampConnectionFormDispatchProps & WampConnectionFormStateProps) {
+export interface WampConnectionFormProps extends WampConnectionFormDispatchProps, WampConnectionFormStateProps {
+  readonly onSubmit: (event: FormSubmitEvent) => void;
+}
+
+export function WampConnectionForm(props: WampConnectionFormProps) {
   return (
     <Card>
       <Card.Header>WAMP Connection</Card.Header>
       <Card.Body>
-        <Form onSubmit={props.connect}>
+        <Form onSubmit={props.onSubmit}>
           <Form.Group controlId='url'>
             <Form.Label>Router URL</Form.Label>
             <Form.Control
@@ -71,7 +76,7 @@ export function WampConnectionForm(props: WampConnectionFormDispatchProps & Wamp
             <Form.Control
               type='text'
               onChange={props.editNamespace}
-              placeholder='com.example'
+              placeholder='com.example.'
               readOnly={props.connecting}
               value={props.form.namespace}
             />

@@ -27,6 +27,7 @@ export interface WampClientError {
 }
 
 export const connectToWampRouter = createAsyncAction<WampConnectionParams, void, WampConnectionError>('CONNECT_TO_WAMP_ROUTER');
+export const deleteWampConnection = createAction<WampConnectionParams>('DELETE_WAMP_CONNECTION');
 export const deleteWampTopicSubscription = createAction<WampSubscriptionParams>('DELETE_WAMP_TOPIC_SUBSCRIPTION');
 export const disconnectFromWampRouter = createAction<WampConnectionParams>('DISCONNECT_FROM_WAMP_ROUTER');
 export const handleWampConnectionClosed = createAction<WampConnectionClosedParams>('HANDLE_WAMP_CONNECTION_CLOSED');

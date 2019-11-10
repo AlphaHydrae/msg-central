@@ -5,14 +5,14 @@ import { WampConnectionFormContainer } from '../wamp-connection-form/wamp-connec
 import { WampSubscriptionFormContainer } from '../wamp-subscription-form/wamp-subscription-form.container';
 
 export interface WampControlsStateProps {
-  readonly connected: boolean;
+  readonly connectionControlsEnabled: boolean;
 }
 
 export function WampControls(props: WampControlsStateProps) {
   return (
     <Fragment>
-      {!props.connected && <WampConnectionFormContainer />}
-      {props.connected && (
+      {!props.connectionControlsEnabled && <WampConnectionFormContainer />}
+      {props.connectionControlsEnabled && (
         <Fragment>
           <WampSubscriptionFormContainer />
           <Card className='mt-3'>

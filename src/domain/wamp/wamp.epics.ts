@@ -2,24 +2,18 @@ import { Connection, Error as AutobahnError, IConnectionOptions, Subscription } 
 import { constant } from 'lodash';
 import { Action } from 'redux';
 import { from, Observable, Observer, of, throwError } from 'rxjs';
-import { catchError, filter, first, ignoreElements, map, mergeMap, switchMap, switchMapTo, tap, withLatestFrom } from 'rxjs/operators';
-import uuid from 'uuid/v4';
+import { catchError, filter, first, ignoreElements, map, mergeMap, switchMap, switchMapTo, tap } from 'rxjs/operators';
 
-import { submitWampConnectionForm } from '../../components/wamp-connection-form/wamp-connection-form.actions';
-import { selectWampConnectionFormParams } from '../../components/wamp-connection-form/wamp-connection-form.selectors';
-import { submitWampSubscriptionForm } from '../../components/wamp-subscription-form/wamp-subscription-form.actions';
 import { AppEpicDependencies } from '../../store/epics';
 import { createEpic } from '../../utils/store';
-import { isNotUndefined } from '../../utils/validations';
 import { connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampClientError } from './wamp.actions';
 import { WampConnectionParams } from './wamp.connection-params';
 import { selectWampSubscriptions } from './wamp.selectors';
 import { WampErrorType, WampSubscriptionParams } from './wamp.state';
 
-export const connectToWampRouterEpic = createEpic((action$, state$, deps) => action$.pipe(
+export const connectToWampRouterEpic = createEpic((action$, _, deps) => action$.pipe(
   filter(connectToWampRouter.started.match),
-  withLatestFrom(state$.pipe(map(selectWampConnectionFormParams))),
-  mergeMap(([ _, params ]) => connect(params, deps))
+  mergeMap(action => connect(action.payload, deps))
 ));
 
 export const disconnectFromWampRouterEpic = createEpic((action$, _, deps) => action$.pipe(
@@ -40,32 +34,6 @@ export const resubscribeToWampTopicsEpic = createEpic((action$, state$) => actio
   filter(connectToWampRouter.done.match),
   switchMapTo(state$.pipe(map(selectWampSubscriptions), first())),
   switchMap(wampSubscriptions => from(wampSubscriptions.map(sub => subscribeToWampTopic.started(sub))))
-));
-
-export const submitWampConnectionFormEpic = createEpic((action$, state$) => action$.pipe(
-  filter(submitWampConnectionForm.match),
-  switchMapTo(state$.pipe(map(selectWampConnectionFormParams), first())),
-  map(params => connectToWampRouter.started(params))
-));
-
-export const submitWampSubscriptionFormEpic = createEpic((action$, state$) => action$.pipe(
-  filter(submitWampSubscriptionForm.match),
-  withLatestFrom(state$),
-  map(([ action, state ]) => {
-
-    // FIXME: attach to correct connection
-    const connection = Object.values(state.session.wampConnections)[0];
-    if (!connection) {
-      return;
-    }
-
-    return subscribeToWampTopic.started({
-      connectionId: connection.id,
-      id: uuid(),
-      topic: action.payload.topic
-    });
-  }),
-  filter(isNotUndefined)
 ));
 
 export const subscribeToWampTopicEpic = createEpic((action$, _, deps) => action$.pipe(
@@ -157,6 +125,7 @@ function subscribe(params: WampSubscriptionParams, deps: AppEpicDependencies): O
       subscriptionId: subscription.id
     }))).then(sub => {
       subscription = sub;
+      wamp.subscriptions.set(params.id, sub);
       observer.next(subscribeToWampTopic.done({ params }));
     });
   });
