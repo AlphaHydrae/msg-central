@@ -5,7 +5,7 @@ import { WampError, WampSubscriptionParams, WampTopicEvent } from './wamp.state'
 export interface HandleWampTopicEventParams {
   readonly connectionId: string;
   readonly event: WampTopicEvent;
-  readonly subscriptionId: number;
+  readonly subscriptionId: string;
 }
 
 export interface WampConnectionClosedParams {

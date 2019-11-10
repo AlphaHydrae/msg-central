@@ -5,10 +5,11 @@ import { from, Observable, Observer, of, throwError } from 'rxjs';
 import { catchError, filter, first, ignoreElements, map, mergeMap, switchMap, switchMapTo, tap } from 'rxjs/operators';
 
 import { AppEpicDependencies } from '../../store/epics';
+import { loadSavedState } from '../../store/storage';
 import { createEpic } from '../../utils/store';
 import { connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampClientError } from './wamp.actions';
 import { WampConnectionParams } from './wamp.connection-params';
-import { selectWampSubscriptions } from './wamp.selectors';
+import { selectWampConnections, selectWampSubscriptions } from './wamp.selectors';
 import { WampErrorType, WampSubscriptionParams } from './wamp.state';
 
 export const connectToWampRouterEpic = createEpic((action$, _, deps) => action$.pipe(
@@ -28,6 +29,12 @@ export const disconnectFromWampRouterEpic = createEpic((action$, _, deps) => act
     wamp.connection.close();
   }),
   ignoreElements()
+));
+
+export const reconnectToWampRouterEpic = createEpic((action$, state$) => action$.pipe(
+  filter(loadSavedState.match),
+  switchMapTo(state$.pipe(map(selectWampConnections), first())),
+  switchMap(connections => from(connections.map(conn => connectToWampRouter.started(conn))))
 ));
 
 export const resubscribeToWampTopicsEpic = createEpic((action$, state$) => action$.pipe(
@@ -122,7 +129,7 @@ function subscribe(params: WampSubscriptionParams, deps: AppEpicDependencies): O
     session.subscribe(params.topic, (args, kwargs, details) => subscription && observer.next(handleWampTopicEvent({
       connectionId: params.connectionId,
       event: { args, kwargs, details },
-      subscriptionId: subscription.id
+      subscriptionId: params.id
     }))).then(sub => {
       subscription = sub;
       wamp.subscriptions.set(params.id, sub);

@@ -35,8 +35,8 @@ export function configureStore() {
     rootReducer,
     composeWithDevTools(
       applyMiddleware(routerMiddleware(history)),
-      applyMiddleware(epicMiddleware),
       applyMiddleware(createStorageMiddleware()),
+      applyMiddleware(epicMiddleware),
       applyMiddleware(logger)
     )
   );

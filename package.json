@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
     "lint": "tslint -c tslint.json -p tsconfig.json",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "react-scripts start",
+    "start:app": "react-scripts start",
+    "start:demo": "node scripts/wamp-demo.js",
+    "test": "react-scripts test"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -70,7 +71,9 @@
     "@types/uuid": "^3.4.6",
     "@types/ws": "^6.0.3",
     "bootstrap": "^4.3.1",
+    "concurrently": "^5.0.0",
     "jquery": "^3.4.1",
+    "ts-node": "^8.4.1",
     "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-consistent-codestyle": "^1.16.0",

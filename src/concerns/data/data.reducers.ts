@@ -2,7 +2,7 @@ import { constant } from 'lodash';
 import { combineReducers } from 'redux';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { connectToWampRouter, handleWampConnectionClosed, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
+import { connectToWampRouter, handleWampConnectionClosed, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
 import { createWampEvent } from '../../domain/wamp/wamp.utils';
 import { DataState, initialDataState } from './data.state';
 
@@ -44,6 +44,14 @@ const eventsReducer = reducerWithInitialState(initialDataState.events)
     ...state,
     createWampEvent({
       type: 'wampConnectionClosed',
+      ...payload
+    })
+  ])
+
+  .case(handleWampTopicEvent, (state, payload) => [
+    ...state,
+    createWampEvent({
+      type: 'wampTopicEventReceived',
       ...payload
     })
   ])

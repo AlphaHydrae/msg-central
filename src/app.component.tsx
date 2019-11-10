@@ -14,7 +14,7 @@ export function App(props: AppStateProps) {
   return (
     <Fragment>
       <NavbarContainer />
-      <Container fluid={true}>
+      <Container className='mb-3' fluid={true}>
         {props.ready && <Routes />}
       </Container>
     </Fragment>
