@@ -27,7 +27,7 @@ export function HomePageComponent(props: HomePageProps) {
               Connect to a Web Application Messaging Protocol (WAMP) router to call procedures and subscribe to topics.
             </Card.Body>
             <Card.Footer>
-              <Link className='btn btn-primary' to={'/ws'}>Let's go</Link>
+              <Link className='btn btn-primary' to={'/wamp'}>Let's go</Link>
             </Card.Footer>
           </Card>
         </CardDeck>
