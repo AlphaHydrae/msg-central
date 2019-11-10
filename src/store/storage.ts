@@ -11,7 +11,7 @@ import { AppState, SavedState } from './state';
 
 export const loadSavedState = createAction<SavedState>('LOAD_SAVED_STATE');
 
-export function createStorageMiddleware(): Middleware {
+export function createStorageLoadingMiddleware(): Middleware {
   return store => {
 
     Promise
@@ -20,17 +20,21 @@ export function createStorageMiddleware(): Middleware {
       .then(savedState => store.dispatch(loadSavedState(savedState)))
       .catch(err => console.warn(err));
 
-    return next => action => {
+    return next => next;
+  };
+}
 
-      const result = next(action);
+export function createStorageMiddleware(): Middleware {
+  return store => next => action => {
 
-      Promise
-        .resolve(store.getState())
-        .then(debounce(saveState, storageDebounceTime, { leading: true }))
-        .catch(err => console.warn(err));
+    const result = next(action);
 
-      return result;
-    };
+    Promise
+      .resolve(store.getState())
+      .then(debounce(saveState, storageDebounceTime, { leading: true }))
+      .catch(err => console.warn(err));
+
+    return result;
   };
 }
 

@@ -14,11 +14,13 @@ export interface AppEvent<A extends Action> {
 export interface DataState {
   readonly activeWampConnections: string[];
   readonly activeWampSubscriptions: ActiveWampSubscription[];
+  readonly activeWsConnections: string[];
   readonly events: Array<AppEvent<any>>;
 }
 
 export const initialDataState: DataState = {
   activeWampConnections: [],
   activeWampSubscriptions: [],
+  activeWsConnections: [],
   events: []
 };

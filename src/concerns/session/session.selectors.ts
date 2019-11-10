@@ -11,3 +11,8 @@ export const selectWampSubscriptionsDictionary = createSelector(
   selectSessionState,
   session => session.wampSubscriptions
 );
+
+export const selectWsConnectionsDictionary = createSelector(
+  selectSessionState,
+  session => session.wsConnections
+);

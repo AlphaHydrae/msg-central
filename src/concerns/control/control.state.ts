@@ -2,6 +2,7 @@ import { EventLogState, initialEventLogState } from '../../components/event-log/
 import { initialWampCallFormState, WampCallFormState } from '../../components/wamp-call-form/wamp-call-form.state';
 import { initialWampConnectionFormState, WampConnectionFormState } from '../../components/wamp-connection-form/wamp-connection-form.state';
 import { initialWampSubscriptionFormState, WampSubscriptionFormState } from '../../components/wamp-subscription-form/wamp-subscription-form.state';
+import { initialWsConnectionFormState, WsConnectionFormState } from '../../components/ws-connection-form/ws-connection-form.state';
 
 export interface ControlState {
   readonly eventLog: EventLogState;
@@ -9,6 +10,7 @@ export interface ControlState {
   readonly wampCallForm: WampCallFormState;
   readonly wampConnectionForm: WampConnectionFormState;
   readonly wampSubscriptionForm: WampSubscriptionFormState;
+  readonly wsConnectionForm: WsConnectionFormState;
 }
 
 export const initialControlState: ControlState = {
@@ -16,5 +18,6 @@ export const initialControlState: ControlState = {
   ready: false,
   wampCallForm: initialWampCallFormState,
   wampConnectionForm: initialWampConnectionFormState,
-  wampSubscriptionForm: initialWampSubscriptionFormState
+  wampSubscriptionForm: initialWampSubscriptionFormState,
+  wsConnectionForm: initialWsConnectionFormState
 };

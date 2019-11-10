@@ -1,6 +1,6 @@
 import { faSignInAlt, faSignOutAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import React, { Fragment } from 'react';
-import { ListGroup, ListGroupItemProps, ButtonGroup } from 'react-bootstrap';
+import { ButtonGroup, ListGroup, ListGroupItemProps } from 'react-bootstrap';
 
 import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
 import { WampSubscriptionParams } from '../../domain/wamp/wamp.state';

@@ -7,16 +7,18 @@ import { createEpicMiddleware } from 'redux-observable';
 import { editWampCallForm } from '../components/wamp-call-form/wamp-call-form.actions';
 import { editWampConnectionForm } from '../components/wamp-connection-form/wamp-connection-form.actions';
 import { editWampSubscriptionForm } from '../components/wamp-subscription-form/wamp-subscription-form.actions';
+import { editWsConnectionForm } from '../components/ws-connection-form/ws-connection-form.actions';
 import { AppEpicDependencies, rootEpic } from './epics';
 import { history } from './history';
 import { rootReducer } from './reducers';
 import { AppState } from './state';
-import { createStorageMiddleware } from './storage';
+import { createStorageLoadingMiddleware, createStorageMiddleware } from './storage';
 
 const silentActionTypes = [
   editWampCallForm,
   editWampConnectionForm,
-  editWampSubscriptionForm
+  editWampSubscriptionForm,
+  editWsConnectionForm
 ].map(creator => creator.type);
 
 export function configureStore() {
@@ -37,8 +39,9 @@ export function configureStore() {
     rootReducer,
     composeWithDevTools(
       applyMiddleware(routerMiddleware(history)),
-      applyMiddleware(createStorageMiddleware()),
+      applyMiddleware(createStorageLoadingMiddleware()),
       applyMiddleware(epicMiddleware),
+      applyMiddleware(createStorageMiddleware()),
       applyMiddleware(logger)
     )
   );

@@ -4,6 +4,7 @@ import { reducerWithInitialState } from 'typescript-fsa-reducers';
 import uuid from 'uuid/v4';
 
 import { connectToWampRouter, handleWampConnectionClosed, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
+import { connectToWsServer, handleWsConnectionClosed } from '../../domain/ws/ws.actions';
 import { eventActionTypes } from './data.actions';
 import { AppEvent, DataState, initialDataState } from './data.state';
 
@@ -40,6 +41,20 @@ const activeWampSubscriptionsReducer = reducerWithInitialState(initialDataState.
 
 ;
 
+const activeWsConnectionsReducer = reducerWithInitialState(initialDataState.activeWsConnections)
+
+  .case(
+    connectToWsServer.done,
+    (state, payload) => [ ...state, payload.params.id ]
+  )
+
+  .case(
+    handleWsConnectionClosed,
+    constant([])
+  )
+
+;
+
 const eventsReducer: Reducer<Array<AppEvent<any>>> =
   (state = initialDataState.events, action) => eventActionTypes.includes(action.type) ?
     [
@@ -55,5 +70,6 @@ const eventsReducer: Reducer<Array<AppEvent<any>>> =
 export const dataReducer = combineReducers<DataState>({
   activeWampConnections: activeWampConnectionsReducer,
   activeWampSubscriptions: activeWampSubscriptionsReducer,
+  activeWsConnections: activeWsConnectionsReducer,
   events: eventsReducer
 });
