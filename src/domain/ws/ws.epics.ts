@@ -40,7 +40,7 @@ function connect(params: WsConnectionParams, deps: AppEpicDependencies): Observa
     const ws = new WebSocket(params.serverUrl);
     deps.ws.set(params.id, ws);
 
-    let connected: boolean | undefined;
+    let connected = false;
     ws.onopen = () => {
       if (!connected) {
         connected = true;
@@ -56,10 +56,12 @@ function connect(params: WsConnectionParams, deps: AppEpicDependencies): Observa
     };
 
     ws.onclose = event => {
-      if (connected === true) {
-        return observer.next(handleWsConnectionClosed({ params, code: event.code, reason: event.reason }));
-      } else if (connected === undefined) {
-        return;
+      if (connected) {
+        return observer.next(handleWsConnectionClosed({
+          params,
+          code: event.code,
+          reason: event.reason
+        }));
       }
 
       observer.next(connectToWsServer.failed({
@@ -69,17 +71,6 @@ function connect(params: WsConnectionParams, deps: AppEpicDependencies): Observa
 
       observer.complete();
       deps.ws.delete(params.id);
-    };
-
-    ws.onerror = () => {
-      if (connected !== false) {
-        return;
-      }
-
-      observer.next(connectToWsServer.failed({
-        params,
-        error: { message: 'An unexpected error occurred' }
-      }));
     };
   });
 }

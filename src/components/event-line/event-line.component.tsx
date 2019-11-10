@@ -7,6 +7,7 @@ import { Action, Success } from 'typescript-fsa';
 import { AppEvent } from '../../concerns/data/data.state';
 import { callWampProcedure, connectToWampRouter, handleWampConnectionClosed, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampConnectionClosedParams } from '../../domain/wamp/wamp.actions';
 import { WampCallParams, WampTopicEvent } from '../../domain/wamp/wamp.state';
+import { connectToWsServer, handleWsConnectionClosed, handleWsMessage, HandleWsMessageParams } from '../../domain/ws/ws.actions';
 import { IconButton } from '../icon-button';
 
 export interface EventLineDispatchProps {
@@ -27,7 +28,11 @@ export type EventLineProps = EventLineDispatchProps & EventLineOwnProps & EventL
 export function EventLineComponent(props: EventLineProps) {
 
   const event = props.event;
-  const { description, details, variant } = getEventLineParts(event);
+  const { description, details, variant } = getWampEventDetails(event.action) || getWsEventDetails(event.action) || {
+    description: <span>Unknown event</span>,
+    details: undefined,
+    variant: 'info'
+  };
 
   return (
     <ListGroup.Item variant={variant}>
@@ -67,13 +72,11 @@ export function EventLineComponent(props: EventLineProps) {
   );
 }
 
-function getEventLineParts(event: AppEvent<any>) {
+function getWampEventDetails(action: Action<any>) {
 
   let description;
   let details;
   let variant: ListGroupItemProps['variant'] = 'info';
-
-  const action = event.action;
 
   if (callWampProcedure.failed.match(action)) {
     switch (action.payload.error.message) {
@@ -89,8 +92,6 @@ function getEventLineParts(event: AppEvent<any>) {
     description = <span>Called WAMP procedure <strong>{action.payload.params.procedure}</strong></span>;
     details = getWampProcedureCallDetails(action);
     variant = 'success';
-  } else if (handleWampConnectionClosed.match(action)) {
-    return getEventLineConnectionClosedParts(action);
   } else if (connectToWampRouter.done.match(action)) {
     description = (
       <span>
@@ -104,6 +105,8 @@ function getEventLineParts(event: AppEvent<any>) {
       </span>
     );
     variant = 'success';
+  } else if (handleWampConnectionClosed.match(action)) {
+    return getWampConnectionClosedDetails(action);
   } else if (handleWampTopicEvent.match(action)) {
     description = <span>Received event</span>;
     details = getWampTopicEventDetails(action.payload.event);
@@ -114,13 +117,38 @@ function getEventLineParts(event: AppEvent<any>) {
     description = <span>Unsubscribed from WAMP topic <strong>{action.payload.params.topic}</strong></span>;
     variant = 'secondary';
   } else {
-    description = <span>Unknown event</span>;
+    return;
   }
 
   return { description, details, variant };
 }
 
-function getEventLineConnectionClosedParts(action: Action<WampConnectionClosedParams>) {
+function getWsEventDetails(action: Action<any>) {
+
+  let description;
+  let details;
+  let variant: ListGroupItemProps['variant'] = 'info';
+
+  if (connectToWsServer.done.match(action)) {
+    description = <span>Connected to WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
+    variant = 'success';
+  } else if (connectToWsServer.failed.match(action)) {
+    description = <span>Error connecting to WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
+    variant = 'danger';
+  } else if (handleWsConnectionClosed.match(action)) {
+    description = <span>Disconnected from WebSocket server at <strong>{action.payload.params.serverUrl}</strong></span>;
+    variant = 'secondary';
+  } else if (handleWsMessage.match(action)) {
+    description = <span>Received WebSocket message</span>;
+    details = getWsMessageDetails(action);
+  } else {
+    return;
+  }
+
+  return { description, details, variant };
+}
+
+function getWampConnectionClosedDetails(action: Action<WampConnectionClosedParams>) {
 
   let description;
   let variant: ListGroupItemProps['variant'] = 'info';
@@ -174,6 +202,29 @@ function getWampTopicEventDetails(event: WampTopicEvent) {
         <pre className='mt-1'>{JSON.stringify(event.details, undefined, 2)}</pre>
       </div>
 
+    </div>
+  );
+}
+
+function getWsMessageDetails(action: Action<HandleWsMessageParams>) {
+
+  const data = action.payload.data;
+
+  let description;
+  if (typeof data === 'string') {
+    try {
+      description = JSON.stringify(JSON.parse(data), undefined, 2);
+    } catch (_) {
+      description = String(data);
+    }
+  } else {
+    description = String(data);
+  }
+
+  return (
+    <div className='mt-2'>
+      <strong>Message data</strong>
+      <pre className='mt-1'>{description}</pre>
     </div>
   );
 }

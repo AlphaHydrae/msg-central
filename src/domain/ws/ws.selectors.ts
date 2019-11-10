@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { createCommunicationActionInProgressSelector } from '../../concerns/comm/comm.utils';
+import { createCommunicationActionSelector } from '../../concerns/comm/comm.utils';
 import { selectWsConnectionsDictionary } from '../../concerns/session/session.selectors';
 import { selectDataState } from '../../store/selectors';
 import { isNotUndefined } from '../../utils/validations';
@@ -11,7 +11,7 @@ export const selectActiveWsConnections = createSelector(
   data => data.activeWsConnections
 );
 
-export const selectConnectingToWsServer = createCommunicationActionInProgressSelector(connectToWsServer);
+export const selectConnectingToWsServer = createCommunicationActionSelector(connectToWsServer);
 
 export const selectCurrentWsConnection = createSelector(
   selectActiveWsConnections,

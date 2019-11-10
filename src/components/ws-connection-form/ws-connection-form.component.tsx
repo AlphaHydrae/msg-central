@@ -1,22 +1,27 @@
+import { faCircleNotch, faSignInAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
-import { Button, Card, Form } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Form } from 'react-bootstrap';
+import { Action } from 'typescript-fsa';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { WsConnectionParams } from '../../domain/ws/ws.state';
 import { FormInputChangeEvent, FormSubmitEvent, isFieldInvalid, isFormInvalid } from '../../utils/forms';
 import { WsConnectionFormState, WsConnectionFormValidations } from './ws-connection-form.state';
 
 export interface WsConnectionFormDispatchProps {
+  readonly cancel: (params: WsConnectionParams) => void;
   readonly connect: (params: WsConnectionParams) => void;
   readonly editServerUrl: (event: FormInputChangeEvent) => void;
 }
 
 export interface WsConnectionFormStateProps {
-  readonly connecting: boolean;
+  readonly connecting?: Action<WsConnectionParams>;
   readonly form: WsConnectionFormState;
   readonly validations: WsConnectionFormValidations;
 }
 
 export interface WsConnectionFormProps extends WsConnectionFormDispatchProps, WsConnectionFormStateProps {
+  readonly onCancelClicked: () => void;
   readonly onSubmit: (event: FormSubmitEvent) => void;
 }
 
@@ -33,7 +38,7 @@ export function WsConnectionFormComponent(props: WsConnectionFormProps) {
               isInvalid={isFieldInvalid(props.validations.serverUrl)}
               onChange={props.editServerUrl}
               placeholder='wss://ws.example.com'
-              readOnly={props.connecting}
+              readOnly={props.connecting !== undefined}
               value={props.form.serverUrl}
             />
             {props.validations.serverUrl.required && (
@@ -48,9 +53,31 @@ export function WsConnectionFormComponent(props: WsConnectionFormProps) {
             )}
           </Form.Group>
 
-          <Button disabled={props.connecting || isFormInvalid(props.validations)} type='submit' variant='primary'>
-            Connect
-          </Button>
+          <ButtonGroup className='float-right'>
+            {props.connecting && (
+              <Button
+                type='button'
+                onClick={props.onCancelClicked}
+                variant='secondary'
+              >
+                <FontAwesomeIcon icon={faTimes} />
+                {' '}
+                Cancel
+              </Button>
+            )}
+            <Button
+              type='submit'
+              disabled={props.connecting !== undefined || isFormInvalid(props.validations)}
+              variant='primary'
+            >
+              <FontAwesomeIcon
+                icon={props.connecting ? faCircleNotch : faSignInAlt}
+                spin={props.connecting !== undefined}
+              />
+              {' '}
+              {props.connecting ? 'Connecting' : 'Connect'}
+            </Button>
+          </ButtonGroup>
         </Form>
       </Card.Body>
     </Card>

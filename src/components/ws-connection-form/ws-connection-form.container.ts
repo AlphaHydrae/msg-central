@@ -1,6 +1,6 @@
 import { connect, MapDispatchToProps, MapStateToProps, MergeProps } from 'react-redux';
 
-import { connectToWsServer } from '../../domain/ws/ws.actions';
+import { connectToWsServer, disconnectFromWsServer } from '../../domain/ws/ws.actions';
 import { selectConnectingToWsServer } from '../../domain/ws/ws.selectors';
 import { AppState } from '../../store/state';
 import { preventDefault } from '../../utils/forms';
@@ -25,6 +25,7 @@ const mapStateToProps: MapStateToProps<WsConnectionFormStateProps, {}, AppState>
 };
 
 const mapDispatchToProps: MapDispatchToProps<WsConnectionFormDispatchProps, {}> = dispatch => ({
+  cancel: params => dispatch(disconnectFromWsServer(params)),
   connect: params => dispatch(connectToWsServer.started(params)),
   editServerUrl: event => dispatch(editWsConnectionForm({ serverUrl: event.currentTarget.value }))
 });
@@ -38,6 +39,7 @@ const mergeProps: MergeProps<
   ...stateProps,
   ...dispatchProps,
   ...ownProps,
+  onCancelClicked: () => stateProps.connecting && dispatchProps.cancel(stateProps.connecting.payload),
   onSubmit: preventDefault(() => dispatchProps.connect(wsConnectionFormToParams(stateProps.form)))
 });
 

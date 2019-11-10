@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { createCommunicationActionInProgressSelector } from '../../concerns/comm/comm.utils';
+import { createCommunicationActionSelector } from '../../concerns/comm/comm.utils';
 import { connectToWsServer } from '../../domain/ws/ws.actions';
 import { selectControlState } from '../../store/selectors';
 
@@ -9,4 +9,4 @@ export const selectWsConnectionFormState = createSelector(
   control => control.wsConnectionForm
 );
 
-export const selectConnectingToWsServer = createCommunicationActionInProgressSelector(connectToWsServer);
+export const selectConnectingToWsServerAction = createCommunicationActionSelector(connectToWsServer);
