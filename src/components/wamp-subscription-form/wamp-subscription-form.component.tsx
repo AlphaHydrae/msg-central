@@ -46,7 +46,12 @@ export function WampSubscriptionForm(props: WampSubscriptionFormProps) {
             )}
           </Form.Group>
 
-          <Button disabled={!props.connection || props.subscribing || isFormInvalid(props.validations)} type='submit' variant='primary'>
+          <Button
+            className='float-right'
+            disabled={!props.connection || props.subscribing || isFormInvalid(props.validations)}
+            type='submit'
+            variant='primary'
+          >
             <FontAwesomeIcon icon={faSignInAlt} />
             {' '}
             Subscribe

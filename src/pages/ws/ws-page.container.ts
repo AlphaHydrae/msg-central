@@ -1,5 +1,16 @@
-import { connect } from 'react-redux';
+import { connect, MapStateToProps } from 'react-redux';
 
-import { WsPageComponent } from './ws-page.component';
+import { AppState } from '../../store/state';
+import { wsEventActionTypes } from './ws-page.actions';
+import { WsPageComponent, WsPageProps } from './ws-page.component';
 
-export const WsPageContainer = connect()(WsPageComponent);
+const mapStateToProps: MapStateToProps<WsPageProps, {}, AppState> = () => ({
+  eventLogFilter: event => wsEventActionTypes.includes(event.action.type)
+});
+
+const mapDispatchToProps = () => ({});
+
+export const WsPageContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(WsPageComponent);

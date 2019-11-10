@@ -19,3 +19,7 @@ export const WampSubscriptionParamsCodec = t.interface({
   id: t.string,
   topic: t.string
 });
+
+export const WampTopicEventDetailsCodec = t.interface({
+  topic: t.string
+});

@@ -56,7 +56,7 @@ export function WampCallFormComponent(props: WampCallFormProps) {
               onChange={props.editArgs}
               placeholder='[ "arg1", "arg2" ]'
               readOnly={!props.connection || props.calling}
-              rows='1'
+              rows='3'
               value={props.form.args}
             />
             {props.validations.args.valid && (
@@ -74,7 +74,7 @@ export function WampCallFormComponent(props: WampCallFormProps) {
               onChange={props.editKwargs}
               placeholder='{ "key1": "value1", "key2": "value2" }'
               readOnly={!props.connection || props.calling}
-              rows='1'
+              rows='3'
               value={props.form.kwargs}
             />
             {props.validations.kwargs.valid && (
@@ -84,7 +84,12 @@ export function WampCallFormComponent(props: WampCallFormProps) {
             )}
           </Form.Group>
 
-          <Button disabled={!props.connection || props.calling || isFormInvalid(props.validations)} type='submit' variant='primary'>
+          <Button
+            className='float-right'
+            disabled={!props.connection || props.calling || isFormInvalid(props.validations)}
+            type='submit'
+            variant='primary'
+          >
             <FontAwesomeIcon icon={faPlay} />
             {' '}
             Call

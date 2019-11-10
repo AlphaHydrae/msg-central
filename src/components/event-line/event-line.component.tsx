@@ -1,7 +1,7 @@
 import { faChevronDown, faChevronUp, faLongArrowAltDown, faLongArrowAltUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Collapse, ListGroup, ListGroupItemProps, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Action, Success } from 'typescript-fsa';
 
@@ -10,6 +10,8 @@ import { callWampProcedure, connectToWampRouter, handleWampConnectionClosed, han
 import { WampCallParams, WampTopicEvent } from '../../domain/wamp/wamp.state';
 import { connectToWsServer, handleWsConnectionClosed, handleWsMessage, HandleWsMessageParams, sendWsMessage, SendWsMessageParams } from '../../domain/ws/ws.actions';
 import { IconButton } from '../icon-button';
+import { decode } from '../../utils/codecs';
+import { WampTopicEventDetailsCodec } from '../../domain/wamp/wamp.codecs';
 
 export interface EventLineDispatchProps {
   readonly hide: () => void;
@@ -109,7 +111,13 @@ function getWampEventDetails(action: Action<any>) {
   } else if (handleWampConnectionClosed.match(action)) {
     return getWampConnectionClosedDetails(action);
   } else if (handleWampTopicEvent.match(action)) {
-    description = <span>Received event</span>;
+    const topicEventDetails = decode(WampTopicEventDetailsCodec, action.payload.event.details);
+    description = (
+      <span>
+        Received WAMP event
+        {topicEventDetails ? <Fragment> on topic <strong>{topicEventDetails.topic}</strong></Fragment> : undefined}
+      </span>
+    );
     details = getWampTopicEventDetails(action.payload.event);
   } else if (subscribeToWampTopic.done.match(action)) {
     description = <span>Subscribed to WAMP topic <strong>{action.payload.params.topic}</strong></span>;
