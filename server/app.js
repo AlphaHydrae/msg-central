@@ -11,6 +11,9 @@ logger.level = 'TRACE';
 
 app.use(express.static(path('build')));
 
+const indexFile = path('build', 'index.html');
+app.get(/^\/(?:[^/]+\/)*[^.]+$/, (req, res) => res.sendFile(indexFile));
+
 const server = app.listen(port);
 
 server.on('listening', () => logger.info(`Listening on port ${port}`));
