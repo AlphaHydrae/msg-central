@@ -1,6 +1,6 @@
 import { Action } from 'redux';
-import { from, Observable } from 'rxjs';
-import { filter, first, ignoreElements, map, mergeMap, switchMap, switchMapTo, tap } from 'rxjs/operators';
+import { from, Observable, of } from 'rxjs';
+import { catchError, filter, first, ignoreElements, map, mergeMap, switchMap, switchMapTo, tap } from 'rxjs/operators';
 
 import { AppEpicDependencies } from '../../store/epics';
 import { loadSavedState } from '../../store/storage';
@@ -11,7 +11,12 @@ import { WsConnectionParams } from './ws.state';
 
 export const connectToWsServerEpic = createEpic((action$, _, deps) => action$.pipe(
   filter(connectToWsServer.started.match),
-  mergeMap(action => connect(action.payload, deps))
+  mergeMap(action => connect(action.payload, deps).pipe(
+    catchError(err => of(connectToWsServer.failed({
+      error: serializeError(err),
+      params: action.payload
+    })))
+  ))
 ));
 
 export const disconnectFromWsServerEpic = createEpic((action$, _, deps) => action$.pipe(
@@ -47,10 +52,7 @@ function connect(params: WsConnectionParams, deps: AppEpicDependencies): Observa
     try {
       ws = new WebSocket(params.serverUrl);
     } catch (err) {
-      return observer.error(connectToWsServer.failed({
-        params,
-        error: serializeError(err)
-      }));
+      return observer.error(err);
     }
 
     deps.ws.set(params.id, ws);
