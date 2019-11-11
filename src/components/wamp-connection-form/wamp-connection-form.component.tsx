@@ -1,5 +1,7 @@
+import { faCircleNotch, faSignInAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Fragment } from 'react';
-import { Button, Card, Form } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Form } from 'react-bootstrap';
 
 import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
 import { FormCheckboxChangeEvent, FormInputChangeEvent, FormSelectChangeEvent, FormSubmitEvent, isFieldInvalid, isFormInvalid } from '../../utils/forms';
@@ -7,6 +9,7 @@ import { WampConnectionFormState, WampConnectionFormValidations } from './wamp-c
 
 export interface WampConnectionFormDispatchProps {
   readonly connect: (params: WampConnectionParams) => void;
+  readonly disconnect: (params: WampConnectionParams) => void;
   readonly editAuthId: (event: FormInputChangeEvent) => void;
   readonly editAuthMethod: (event: FormSelectChangeEvent) => void;
   readonly editAuthTicket: (event: FormInputChangeEvent) => void;
@@ -17,12 +20,13 @@ export interface WampConnectionFormDispatchProps {
 }
 
 export interface WampConnectionFormStateProps {
-  readonly connecting: boolean;
+  readonly connection?: WampConnectionParams;
   readonly form: WampConnectionFormState;
   readonly validations: WampConnectionFormValidations;
 }
 
 export interface WampConnectionFormProps extends WampConnectionFormDispatchProps, WampConnectionFormStateProps {
+  readonly onCancel: () => void;
   readonly onSubmit: (event: FormSubmitEvent) => void;
 }
 
@@ -39,7 +43,7 @@ export function WampConnectionForm(props: WampConnectionFormProps) {
               isInvalid={isFieldInvalid(props.validations.routerUrl)}
               onChange={props.editRouterUrl}
               placeholder='wss://wamp.example.com/ws'
-              readOnly={props.connecting}
+              readOnly={props.connection !== undefined}
               value={props.form.routerUrl}
             />
             {props.validations.routerUrl.required && (
@@ -61,7 +65,7 @@ export function WampConnectionForm(props: WampConnectionFormProps) {
               isInvalid={isFieldInvalid(props.validations.realm)}
               onChange={props.editRealm}
               placeholder='realm1'
-              readOnly={props.connecting}
+              readOnly={props.connection !== undefined}
               value={props.form.realm}
             />
             {props.validations.realm.required && (
@@ -77,7 +81,7 @@ export function WampConnectionForm(props: WampConnectionFormProps) {
               type='text'
               onChange={props.editNamespace}
               placeholder='com.example.'
-              readOnly={props.connecting}
+              readOnly={props.connection !== undefined}
               value={props.form.namespace}
             />
             <Form.Text>
@@ -90,7 +94,7 @@ export function WampConnectionForm(props: WampConnectionFormProps) {
             <Form.Control
               as='select'
               onChange={props.editAuthMethod}
-              readOnly={props.connecting}
+              readOnly={props.connection !== undefined}
               value={props.form.authMethod || undefined}
             >
               <option value={''}>None</option>
@@ -100,9 +104,31 @@ export function WampConnectionForm(props: WampConnectionFormProps) {
 
           {props.form.authMethod && <WampAuthForm {...props} />}
 
-          <Button disabled={props.connecting || isFormInvalid(props.validations)} type='submit' variant='primary'>
-            Connect
-          </Button>
+          <ButtonGroup className='float-right'>
+            {props.connection !== undefined && (
+              <Button
+                type='button'
+                onClick={props.onCancel}
+                variant='secondary'
+              >
+                <FontAwesomeIcon icon={faTimes} />
+                {' '}
+                Cancel
+              </Button>
+            )}
+            <Button
+              disabled={props.connection !== undefined || isFormInvalid(props.validations)}
+              type='submit'
+              variant='primary'
+            >
+              <FontAwesomeIcon
+                icon={props.connection ? faCircleNotch : faSignInAlt}
+                spin={props.connection !== undefined}
+              />
+              {' '}
+              {props.connection ? 'Connecting' : 'Connect'}
+            </Button>
+          </ButtonGroup>
         </Form>
       </Card.Body>
     </Card>
@@ -123,7 +149,7 @@ function WampAuthForm(props: WampConnectionFormDispatchProps & WampConnectionFor
           isInvalid={isFieldInvalid(props.validations.authTicket)}
           onChange={props.editAuthTicket}
           placeholder='Your secret ticket...'
-          readOnly={props.connecting}
+          readOnly={props.connection !== undefined}
           value={params.authTicket}
         />
         {props.validations.authTicket.required && (
@@ -144,7 +170,7 @@ function WampAuthForm(props: WampConnectionFormDispatchProps & WampConnectionFor
           isInvalid={isFieldInvalid(props.validations.authId)}
           onChange={props.editAuthId}
           placeholder='Your authentication ID...'
-          readOnly={props.connecting}
+          readOnly={props.connection !== undefined}
           value={params.authId}
         />
         {props.validations.authId.required && (
@@ -161,7 +187,7 @@ function WampAuthForm(props: WampConnectionFormDispatchProps & WampConnectionFor
           type='checkbox'
           checked={params.saveAuth}
           label='Save credentials'
-          readOnly={props.connecting}
+          readOnly={props.connection !== undefined}
           onChange={props.editSaveAuth}
         />
         <Form.Text>

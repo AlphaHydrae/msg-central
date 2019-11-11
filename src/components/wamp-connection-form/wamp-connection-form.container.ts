@@ -1,8 +1,8 @@
 import { connect, MapDispatchToProps, MapStateToProps, MergeProps } from 'react-redux';
 
-import { connectToWampRouter } from '../../domain/wamp/wamp.actions';
+import { connectToWampRouter, disconnectFromWampRouter } from '../../domain/wamp/wamp.actions';
 import { isWampAuthMethod } from '../../domain/wamp/wamp.auth-params';
-import { selectConnectingToWampRouter } from '../../domain/wamp/wamp.selectors';
+import { selectConnectToWampRouterParams } from '../../domain/wamp/wamp.selectors';
 import { AppState } from '../../store/state';
 import { preventDefault } from '../../utils/forms';
 import { isBlank, isUrlString } from '../../utils/validations';
@@ -14,7 +14,7 @@ import { wampConnectionFormToParams } from './wamp-connection-form.utils';
 const mapStateToProps: MapStateToProps<WampConnectionFormStateProps, {}, AppState> = state => {
   const connectionParams = selectWampConnectionFormState(state);
   return {
-    connecting: selectConnectingToWampRouter(state),
+    connection: selectConnectToWampRouterParams(state),
     form: connectionParams,
     validations: {
       authId: {
@@ -36,6 +36,7 @@ const mapStateToProps: MapStateToProps<WampConnectionFormStateProps, {}, AppStat
 
 const mapDispatchToProps: MapDispatchToProps<WampConnectionFormDispatchProps, {}> = dispatch => ({
   connect: params => dispatch(connectToWampRouter.started(params)),
+  disconnect: params => dispatch(disconnectFromWampRouter(params)),
   editAuthId: event => dispatch(editWampConnectionForm({ authId: event.currentTarget.value })),
   editAuthMethod: event => dispatch(editWampConnectionForm({
     authMethod: isWampAuthMethod(event.currentTarget.value) ? event.currentTarget.value : null
@@ -56,6 +57,7 @@ const mergeProps: MergeProps<
   ...stateProps,
   ...dispatchProps,
   ...ownProps,
+  onCancel: () => stateProps.connection && dispatchProps.disconnect(stateProps.connection),
   onSubmit: preventDefault(() => dispatchProps.connect(wampConnectionFormToParams(stateProps.form)))
 });
 

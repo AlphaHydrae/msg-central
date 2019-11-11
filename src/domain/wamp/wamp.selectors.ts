@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { createCommunicationActionInProgressSelector, createCommunicationActionSelector } from '../../concerns/comm/comm.utils';
+import { createCommunicationActionSelector } from '../../concerns/comm/comm.utils';
 import { selectWampConnectionsDictionary, selectWampSubscriptionsDictionary } from '../../concerns/session/session.selectors';
 import { selectDataState } from '../../store/selectors';
 import { isNotUndefined } from '../../utils/validations';
@@ -16,9 +16,10 @@ export const selectActiveWampSubscriptions = createSelector(
   data => data.activeWampSubscriptions
 );
 
-export const selectConnectingToWampRouter = createCommunicationActionInProgressSelector(connectToWampRouter);
-
-export const selectConnectToWampRouterAction = createCommunicationActionSelector(connectToWampRouter);
+export const selectConnectToWampRouterParams = createSelector(
+  createCommunicationActionSelector(connectToWampRouter),
+  connection => connection !== undefined ? connection.payload : undefined
+);
 
 export const selectCurrentWampConnection = createSelector(
   selectActiveWampConnections,
