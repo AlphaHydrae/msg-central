@@ -20,6 +20,7 @@ export function wampConnectionFormToParams(form: WampConnectionFormState): WampC
     id: uuid(),
     namespace: form.namespace || undefined,
     realm: form.realm,
-    routerUrl: form.routerUrl
+    routerUrl: form.routerUrl,
+    saveAuth: form.saveAuth
   };
 }

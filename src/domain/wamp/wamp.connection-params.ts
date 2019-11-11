@@ -6,4 +6,5 @@ export interface WampConnectionParams {
   readonly namespace?: string;
   readonly realm: string;
   readonly routerUrl: string;
+  readonly saveAuth: boolean;
 }

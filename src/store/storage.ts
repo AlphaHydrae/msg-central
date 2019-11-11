@@ -59,7 +59,9 @@ function getStateToSave(state: AppState): SavedState {
       ...state.session,
       wampConnections: mapValues(wampConnections, conn => conn ? {
         ...conn,
-        auth: conn.auth && conn.auth.method === 'ticket' ? { ...conn.auth, ticket: '' } : undefined
+        auth: conn.auth && conn.auth.method === 'ticket' ?
+          { ...conn.auth, ticket: conn.saveAuth ? conn.auth.ticket : '' } :
+          undefined
       } : undefined)
     }
   };
