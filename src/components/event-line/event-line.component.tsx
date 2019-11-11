@@ -6,12 +6,13 @@ import { Collapse, ListGroup, ListGroupItemProps, OverlayTrigger, Tooltip } from
 import { Action, Success } from 'typescript-fsa';
 
 import { AppEvent } from '../../concerns/data/data.state';
-import { callWampProcedure, connectToWampRouter, handleWampConnectionClosed, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic, WampConnectionClosedParams } from '../../domain/wamp/wamp.actions';
+import { callWampProcedure, connectToWampRouter, handleWampConnectionClosed, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic } from '../../domain/wamp/wamp.actions';
+import { WampTopicEventDetailsCodec } from '../../domain/wamp/wamp.codecs';
+import { WampConnectionParams } from '../../domain/wamp/wamp.connection-params';
 import { WampCallParams, WampTopicEvent } from '../../domain/wamp/wamp.state';
 import { connectToWsServer, handleWsConnectionClosed, handleWsMessage, HandleWsMessageParams, sendWsMessage, SendWsMessageParams } from '../../domain/ws/ws.actions';
-import { IconButton } from '../icon-button';
 import { decode } from '../../utils/codecs';
-import { WampTopicEventDetailsCodec } from '../../domain/wamp/wamp.codecs';
+import { IconButton } from '../icon-button';
 
 export interface EventLineDispatchProps {
   readonly hide: () => void;
@@ -108,8 +109,10 @@ function getWampEventDetails(action: Action<any>) {
       </span>
     );
     variant = 'success';
+  } else if (connectToWampRouter.failed.match(action)) {
+    return getWampConnectionClosedDetails(action.payload.params, action.payload.error.reason);
   } else if (handleWampConnectionClosed.match(action)) {
-    return getWampConnectionClosedDetails(action);
+    return getWampConnectionClosedDetails(action.payload.params, action.payload.reason);
   } else if (handleWampTopicEvent.match(action)) {
     const topicEventDetails = decode(WampTopicEventDetailsCodec, action.payload.event.details);
     description = (
@@ -132,26 +135,26 @@ function getWampEventDetails(action: Action<any>) {
   return { description, details, variant };
 }
 
-function getWampConnectionClosedDetails(action: Action<WampConnectionClosedParams>) {
+function getWampConnectionClosedDetails(params: WampConnectionParams, reason: string) {
 
   let description;
   let variant: ListGroupItemProps['variant'] = 'info';
 
-  switch (action.payload.reason) {
+  switch (reason) {
     case 'closed':
-      description = <span>Closed WAMP connection to <strong>{action.payload.params.routerUrl}</strong></span>;
+      description = <span>Closed WAMP connection to <strong>{params.routerUrl}</strong></span>;
       variant = 'secondary';
       break;
     case 'lost':
-      description = <span>Connection lost to WAMP router <strong>{action.payload.params.routerUrl}</strong></span>;
+      description = <span>Connection lost to WAMP router <strong>{params.routerUrl}</strong></span>;
       variant = 'danger';
       break;
     case 'unreachable':
-      description = <span>WAMP router URL <strong>{action.payload.params.routerUrl}</strong> is unreachable</span>;
+      description = <span>WAMP router URL <strong>{params.routerUrl}</strong> is unreachable</span>;
       variant = 'danger';
       break;
     default:
-      description = <span>Connection to WAMP router closed due to: {action.payload.reason}</span>;
+      description = <span>Connection to WAMP router closed due to: {reason}</span>;
       variant = 'warning';
   }
 
