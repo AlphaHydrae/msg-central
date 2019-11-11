@@ -6,7 +6,12 @@ const selectEventLogState = createSelector(
   control => control.eventLog
 );
 
-export const selectExpandedEventIds = createSelector(
+export const selectShowEventDetails = createSelector(
   selectEventLogState,
-  eventLog => eventLog.expandedEventIds
+  eventLog => eventLog.showEventDetails
+);
+
+export const selectToggledEventIds = createSelector(
+  selectEventLogState,
+  eventLog => eventLog.toggledEventIds
 );

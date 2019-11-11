@@ -68,7 +68,7 @@ export function EventLineComponent(props: EventLineProps) {
       </div>
 
       {details && (
-        <Collapse appear={true} in={props.expanded} mountOnEnter={true} unmountOnExit={true}>
+        <Collapse in={props.expanded}>
           {details}
         </Collapse>
       )}
@@ -211,7 +211,7 @@ function getWsEventDetails(action: Action<any>) {
   } else if (handleWsMessage.match(action)) {
     description = (
       <span>
-        <FontAwesomeIcon className='mr-1' icon={faLongArrowAltDown} />
+        <FontAwesomeIcon className='mr-1 text-danger' icon={faLongArrowAltDown} />
         {' '}
         Received WebSocket message
       </span>
@@ -220,7 +220,7 @@ function getWsEventDetails(action: Action<any>) {
   } else if (sendWsMessage.match(action)) {
     description = (
       <span>
-        <FontAwesomeIcon className='mr-1' icon={faLongArrowAltUp} />
+        <FontAwesomeIcon className='mr-1 text-success' icon={faLongArrowAltUp} />
         {' '}
         Sent WebSocket message
       </span>

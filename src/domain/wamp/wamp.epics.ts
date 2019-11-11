@@ -110,7 +110,7 @@ function connect(params: WampConnectionParams, deps: AppEpicDependencies): Obser
             params,
             error: {
               reason: 'internalError',
-              details: { customErrorMessage, error }
+              details: { customErrorMessage, error: serializeError(error) }
             }
           }));
 

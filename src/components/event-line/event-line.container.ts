@@ -2,12 +2,18 @@ import { connect, MapDispatchToProps, MapStateToProps, MergeProps } from 'react-
 
 import { AppState } from '../../store/state';
 import { hideEventDetails, showEventDetails } from '../event-log/event-log.actions';
-import { selectExpandedEventIds } from '../event-log/event-log.selectors';
+import { selectShowEventDetails, selectToggledEventIds } from '../event-log/event-log.selectors';
 import { EventLineComponent, EventLineDispatchProps, EventLineOwnProps, EventLineProps, EventLineStateProps } from './event-line.component';
 
-const mapStateToProps: MapStateToProps<EventLineStateProps, EventLineOwnProps, AppState> = (state, ownProps) => ({
-  expanded: selectExpandedEventIds(state).includes(ownProps.event.id)
-});
+const mapStateToProps: MapStateToProps<EventLineStateProps, EventLineOwnProps, AppState> = (state, ownProps) => {
+
+  const show = selectShowEventDetails(state);
+  const toggled = selectToggledEventIds(state).includes(ownProps.event.id);
+
+  return {
+    expanded: show ? !toggled : toggled
+  };
+};
 
 const mapDispatchToProps: MapDispatchToProps<EventLineDispatchProps, EventLineOwnProps> = (dispatch, ownProps) => ({
   hide: () => dispatch(hideEventDetails(ownProps.event.id)),

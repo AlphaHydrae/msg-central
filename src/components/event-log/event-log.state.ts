@@ -1,7 +1,9 @@
 export interface EventLogState {
-  readonly expandedEventIds: string[];
+  readonly showEventDetails: boolean;
+  readonly toggledEventIds: string[];
 }
 
 export const initialEventLogState: EventLogState = {
-  expandedEventIds: []
+  showEventDetails: true,
+  toggledEventIds: []
 };

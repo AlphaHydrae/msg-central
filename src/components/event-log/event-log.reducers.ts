@@ -1,24 +1,30 @@
 import { without } from 'lodash';
-import { combineReducers } from 'redux';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { hideEventDetails, showEventDetails } from './event-log.actions';
-import { EventLogState, initialEventLogState } from './event-log.state';
+import { hideEventDetails, setShowAllEventDetails, showEventDetails } from './event-log.actions';
+import { initialEventLogState } from './event-log.state';
 
-const expandedEventIdsReducer = reducerWithInitialState(initialEventLogState.expandedEventIds)
+export const eventLogReducer = reducerWithInitialState(initialEventLogState)
 
   .case(
     hideEventDetails,
-    without
+    (state, payload) => ({
+      ...state,
+      toggledEventIds: state.showEventDetails ? [ ...state.toggledEventIds, payload ] : without(state.toggledEventIds, payload)
+    })
   )
 
   .case(
     showEventDetails,
-    (state, payload) => [ ...state, payload ]
+    (state, payload) => ({
+      ...state,
+      toggledEventIds: state.showEventDetails ? without(state.toggledEventIds, payload) : [ ...state.toggledEventIds, payload ]
+    })
+  )
+
+  .case(
+    setShowAllEventDetails,
+    (_, payload) => ({ showEventDetails: payload, toggledEventIds: initialEventLogState.toggledEventIds })
   )
 
 ;
-
-export const eventLogReducer = combineReducers<EventLogState>({
-  expandedEventIds: expandedEventIdsReducer
-});
