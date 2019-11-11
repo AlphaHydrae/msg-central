@@ -1,7 +1,7 @@
 import { Connection, IConnectionOptions, Subscription } from 'autobahn';
 import { constant } from 'lodash';
 import { Action } from 'redux';
-import { from, Observable, Observer, of, throwError } from 'rxjs';
+import { from, Observable, of, throwError } from 'rxjs';
 import { catchError, filter, first, ignoreElements, map, mergeMap, switchMap, switchMapTo, tap } from 'rxjs/operators';
 
 import { AppEpicDependencies } from '../../store/epics';
@@ -10,7 +10,7 @@ import { createEpic, serializeError } from '../../utils/store';
 import { callWampProcedure, connectToWampRouter, disconnectFromWampRouter, handleWampConnectionClosed, handleWampError, handleWampTopicEvent, subscribeToWampTopic, unsubscribeFromWampTopic } from './wamp.actions';
 import { WampConnectionParams } from './wamp.connection-params';
 import { selectWampConnections, selectWampSubscriptions } from './wamp.selectors';
-import { WampCallParams, WampErrorType, WampSubscriptionParams } from './wamp.state';
+import { WampCallParams, WampSubscriptionParams } from './wamp.state';
 import { serializeWampClientError } from './wamp.utils';
 
 export const callWampProcedureEpic = createEpic((action$, _, deps) => action$.pipe(
@@ -97,12 +97,40 @@ function connect(params: WampConnectionParams, deps: AppEpicDependencies): Obser
       connectionOptions.onchallenge = constant(ticket);
     }
 
+    let connected = false;
+
     // Using any here because error-handling callbacks are not in the type
     // definitions.
     const connectionOptionsWithHandlers: any = {
       ...connectionOptions,
-      on_internal_error: createErrorHandler('internalError', observer),
-      on_user_error: createErrorHandler('userError', observer)
+      on_internal_error: (error: unknown, customErrorMessage: unknown) => {
+        if (!connected) {
+
+          observer.next(connectToWampRouter.failed({
+            params,
+            error: {
+              reason: 'internalError',
+              details: { customErrorMessage, error }
+            }
+          }));
+
+          observer.complete();
+          deps.wamp.delete(params.id);
+
+          return;
+        }
+
+        observer.next(handleWampError({
+          type: 'internalError',
+          customErrorMessage: serializeError(customErrorMessage),
+          error: serializeError(error)
+        }));
+      },
+      on_user_error: (error: unknown, customErrorMessage: unknown) => observer.next(handleWampError({
+        type: 'userError',
+        customErrorMessage: serializeError(customErrorMessage),
+        error: serializeError(error)
+      }))
     };
 
     const connection = new Connection(connectionOptionsWithHandlers);
@@ -110,7 +138,6 @@ function connect(params: WampConnectionParams, deps: AppEpicDependencies): Obser
 
     connection.open();
 
-    let connected = false;
     connection.onopen = () => {
       if (!connected) {
         connected = true;
@@ -176,12 +203,4 @@ function unsubscribe(subscription: WampSubscriptionParams, deps: AppEpicDependen
   }
 
   return from(wampSubscription.unsubscribe().then(() => unsubscribeFromWampTopic.done({ params: subscription })));
-}
-
-function createErrorHandler(type: WampErrorType, observer: Observer<Action>) {
-  return (error: unknown, customErrorMessage: unknown) => observer.next(handleWampError({
-    type,
-    customErrorMessage: serializeError(customErrorMessage),
-    error: serializeError(error)
-  }));
 }
