@@ -20,7 +20,7 @@ export function Navbar(props: NavbarStateProps) {
           <BootstrapNavbar.Collapse id='navbar'>
             <Nav className='mr-auto'>
               <LinkContainer exact={true} to={'/ws'}>
-                <Nav.Link>WS</Nav.Link>
+                <Nav.Link>WebSocket</Nav.Link>
               </LinkContainer>
               <LinkContainer exact={true} to={'/wamp'}>
                 <Nav.Link>WAMP</Nav.Link>

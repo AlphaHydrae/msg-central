@@ -20,6 +20,7 @@ export interface SendWsMessageParams {
 
 export interface WsClientError {
   readonly message: string;
+  readonly name?: string;
   readonly stack?: string;
 }
 

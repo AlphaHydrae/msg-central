@@ -4,7 +4,7 @@ import { filter, first, ignoreElements, map, mergeMap, switchMap, switchMapTo, t
 
 import { AppEpicDependencies } from '../../store/epics';
 import { loadSavedState } from '../../store/storage';
-import { createEpic } from '../../utils/store';
+import { createEpic, serializeError } from '../../utils/store';
 import { connectToWsServer, disconnectFromWsServer, handleWsConnectionClosed, handleWsMessage, sendWsMessage, SendWsMessageParams } from './ws.actions';
 import { selectWsConnections } from './ws.selectors';
 import { WsConnectionParams } from './ws.state';
@@ -43,7 +43,16 @@ export const sendWsMessageEpic = createEpic((action$, _, deps) => action$.pipe(
 function connect(params: WsConnectionParams, deps: AppEpicDependencies): Observable<Action> {
   return new Observable(observer => {
 
-    const ws = new WebSocket(params.serverUrl);
+    let ws;
+    try {
+      ws = new WebSocket(params.serverUrl);
+    } catch (err) {
+      return observer.error(connectToWsServer.failed({
+        params,
+        error: serializeError(err)
+      }));
+    }
+
     deps.ws.set(params.id, ws);
 
     let connected = false;

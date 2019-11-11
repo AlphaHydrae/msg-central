@@ -34,15 +34,26 @@ export const createAsyncAction = <Params, Result, Error>(type: ActionType) => {
 
 export function serializeError(err: unknown) {
   if (typeof err === 'string') {
-    return err;
+    return {
+      message: err
+    };
+  } else if (err instanceof DOMException) {
+    return {
+      code: err.code,
+      message: err.message,
+      name: err.name
+    };
   } else if (err instanceof Error) {
     return {
       message: err.message,
+      name: err.name,
       stack: err.stack
     };
   }
 
-  return JSON.stringify(err);
+  return {
+    message: JSON.stringify(err)
+  };
 }
 
 function registerActionType(type: string) {
