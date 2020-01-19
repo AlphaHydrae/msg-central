@@ -35,7 +35,7 @@ export function WampCallFormComponent(props: WampCallFormProps) {
         <Form onSubmit={props.onSubmit}>
 
           <Form.Group controlId='procedure'>
-            <Form.Label>Topic</Form.Label>
+            <Form.Label>Procedure name</Form.Label>
             <Form.Control
               type='text'
               onChange={props.editProcedure}

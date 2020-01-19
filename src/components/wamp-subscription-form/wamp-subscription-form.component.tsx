@@ -33,7 +33,7 @@ export function WampSubscriptionForm(props: WampSubscriptionFormProps) {
         <Form onSubmit={props.submit}>
 
           <Form.Group controlId='topic'>
-            <Form.Label>Topic</Form.Label>
+            <Form.Label>Topic name</Form.Label>
             <Form.Control
               type='text'
               onChange={props.editTopic}
